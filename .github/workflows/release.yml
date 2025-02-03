@@ -1,0 +1,29 @@
+name: Publish release
+on:
+  release:
+    types:
+      - published
+
+jobs:
+  publish-release:
+    runs-on: ubuntu-latest
+    permissions:
+      packages: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.release.tag_name }}
+      - uses: actions/setup-java@v4
+        with:
+          java-version: 21
+          distribution: 'temurin'
+          cache: 'maven'
+      - name: Publish package
+        env:
+          NEW_VERSION: ${{ github.event.release.tag_name }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        shell: bash
+        run: |
+          mvn -B versions:set -DnewVersion=${NEW_VERSION}
+          mvn -B versions:commit
+          mvn -B clean deploy
