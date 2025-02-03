@@ -7,6 +7,30 @@
     <groupId>no.nav.openapi.spec.utils</groupId>
     <artifactId>openapi-spec-utils</artifactId>
     <version>1.0-SNAPSHOT</version>
+    <licenses>
+        <license>
+            <name>MIT License</name>
+            <url>https://opensource.org/licenses/MIT</url>
+        </license>
+    </licenses>
+    <developers>
+        <developer>
+            <organization>NAV (Arbeids- og velferdsdirektoratet) - The Norwegian Labour and Welfare Administration</organization>
+            <organizationUrl>https://www.nav.no</organizationUrl>
+        </developer>
+    </developers>
+    <distributionManagement>
+        <repository>
+            <id>github</id>
+            <url>https://maven.pkg.github.com/navikt/openapi-spec-utils</url>
+        </repository>
+    </distributionManagement>
+    <scm>
+        <developerConnection>scm:git:git@github.com:navikt/openapi-spec-utils.git</developerConnection>
+        <connection>scm:git:git@github.com:navikt/openapi-spec-utils.git</connection>
+        <url>https://github.com/navikt/openapi-spec-utils</url>
+        <tag>HEAD</tag>
+    </scm>
 
     <properties>
         <maven.compiler.source>21</maven.compiler.source>
@@ -64,4 +88,21 @@
             <scope>test</scope>
         </dependency>
     </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <artifactId>maven-source-plugin</artifactId>
+                <version>3.3.1</version>
+                <executions>
+                    <execution>
+                        <id>include-sources</id>
+                        <goals>
+                            <goal>jar-no-fork</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
 </project>
