@@ -3,7 +3,13 @@ name: CI
 on:
   push:
     branches:
-      - '*'
+      - '**'
+    paths-ignore:
+      - '**.md'
+      - '**.MD'
+      - '.gitignore'
+      - 'LICENSE'
+      - 'CODEOWNERS'
 
 jobs:
   build:
@@ -16,5 +22,5 @@ jobs:
           java-version: 21
           distribution: 'temurin'
           cache: 'maven'
-      - name: Build with Maven
-        run: mvn clean install
+      - name: Build and test
+        run: mvn verify -e
