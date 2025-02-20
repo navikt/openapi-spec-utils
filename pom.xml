@@ -6,7 +6,7 @@
 
     <groupId>no.nav.openapi.spec.utils</groupId>
     <artifactId>openapi-spec-utils</artifactId>
-    <version>0.1.0-beta</version>
+    <version>1.0.0</version>
     <licenses>
         <license>
             <name>MIT License</name>

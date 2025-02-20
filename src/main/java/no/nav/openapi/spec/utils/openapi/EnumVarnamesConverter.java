@@ -29,7 +29,7 @@ public class EnumVarnamesConverter implements ModelConverter {
             // First, resolve the schema for current type
             final var resolvedSchema = chain.next().resolve(type, context, chain);
             // If resolved schema type has enum values, resolve and add x-enum-varnames
-            if(resolvedSchema.getEnum() != null && !resolvedSchema.getEnum().isEmpty()) {
+            if(resolvedSchema != null && resolvedSchema.getEnum() != null && !resolvedSchema.getEnum().isEmpty()) {
                 // Find enum name values, and add them to "x-enum-varnames" extension.
                 // This makes the generated enum consts have the same property names as the java enums has declared.
                 final var enumValues = resolvedSchema.getEnum();
