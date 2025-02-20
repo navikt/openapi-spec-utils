@@ -77,7 +77,7 @@ public class OpenApiSetupHelper {
                 .buildContext(false);
     }
 
-    protected OpenAPI addOpenApiCustomizations(final OpenAPIConfiguration baseConfig) throws OpenApiConfigurationException {
+    protected OpenAPI createWithCustomizations(final OpenAPIConfiguration baseConfig) throws OpenApiConfigurationException {
         final var context = this.buildContext(baseConfig);
         // EnumVarnamesConverter legger til x-enum-varnames for property namn på genererte enum objekt.
         context.setModelConverters(Set.of(new EnumVarnamesConverter(this.objectMapper())));
@@ -90,7 +90,7 @@ public class OpenApiSetupHelper {
     }
 
     public OpenAPI resolveOpenAPI() throws OpenApiConfigurationException {
-        return this.addOpenApiCustomizations(this.initBaseConfig());
+        return this.createWithCustomizations(this.initBaseConfig());
     }
 
 }
