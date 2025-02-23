@@ -6,7 +6,7 @@
 
     <groupId>no.nav.openapi.spec.utils</groupId>
     <artifactId>openapi-spec-utils</artifactId>
-    <version>1.0.0</version>
+    <version>1.2.0</version>
     <licenses>
         <license>
             <name>MIT License</name>
@@ -72,6 +72,12 @@
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter-api</artifactId>
+            <version>5.11.4</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-params</artifactId>
             <version>5.11.4</version>
             <scope>test</scope>
         </dependency>

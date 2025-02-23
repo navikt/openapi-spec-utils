@@ -28,7 +28,7 @@ import java.util.Objects;
  */
 @Path("/openapi.{type:json|yaml}")
 public class OpenApiResource {
-    private final OpenAPI resolvedOpenAPI;
+    private OpenAPI resolvedOpenAPI;
     private final ObjectMapper jsonOutputMapper;
     private final ObjectMapper yamlOutputMapper;
 
@@ -36,7 +36,7 @@ public class OpenApiResource {
             final OpenAPI resolvedOpenAPI,
             final ObjectMapper jsonOutputMapper,
             final ObjectMapper yamlOutputMapper) {
-        this.resolvedOpenAPI = Objects.requireNonNull(resolvedOpenAPI);
+        this.resolvedOpenAPI = resolvedOpenAPI;
         this.jsonOutputMapper = withDeterministicOutput(Objects.requireNonNull(jsonOutputMapper));
         this.yamlOutputMapper = withDeterministicOutput(Objects.requireNonNull(yamlOutputMapper));
     }
@@ -50,6 +50,10 @@ public class OpenApiResource {
 
     public OpenApiResource(final OpenAPI resolvedOpenAPI) {
         this(resolvedOpenAPI, ObjectMapperFactory.createJson(), ObjectMapperFactory.createYaml());
+    }
+
+    public void setResolvedOpenAPI(final OpenAPI resolvedOpenAPI) {
+        this.resolvedOpenAPI = Objects.requireNonNull(resolvedOpenAPI);
     }
 
     public boolean wantsYaml(final String type) {
