@@ -5,8 +5,6 @@ import jakarta.ws.rs.container.ContainerResponseContext;
 import jakarta.ws.rs.container.ContainerResponseFilter;
 import no.nav.openapi.spec.utils.jackson.DynamicObjectMapperResolver;
 
-import java.io.IOException;
-
 /**
  * When using DynamicObjectMapperResolver, the response content becomes dependent on the X-Json-Serializer-Option header.
  * It must therefore be set in the response Vary header to ensure that caches do not serve the wrong content to clients if
@@ -21,7 +19,7 @@ public class DynamicObjectMapperResolverVaryFilter implements ContainerResponseF
     public DynamicObjectMapperResolverVaryFilter() {}
 
     @Override
-    public void filter(ContainerRequestContext req, ContainerResponseContext res) throws IOException {
+    public void filter(ContainerRequestContext req, ContainerResponseContext res) {
         res.getHeaders().add("Vary", DynamicObjectMapperResolver.HEADER_KEY);
     }
 }
