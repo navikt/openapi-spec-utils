@@ -70,6 +70,7 @@ For at klient skal kunne styre kva serialisering/deserialisering server skal utf
 - Legg til ein `ObjectMapperResolver` basert på `DynamicObjectMapperResolver` slik det er gjort i k9-sak, eller bruk `DynamicObjectMapperResolver` direkte. Denne ser på header for aktiv request, og returnerer ein av dei ulike definerte `ObjectMapper` variantane.
 - Legg til `DynamicJacksonJsonProvider` for å deaktivere standard caching av resultat frå `ObjectMapperResolver`. Nødvendig sidan `DynamicObjectMapperResolver` resultat varierer basert på request.
 - Bruk `OpenapiCompatObjectMapperModifier` frå dette prosjekt til å bygge openapi kompatibel serialisering/deserialisering uten å finne opp kruttet på nytt.
+- Bruk `DynamicObjectMapperResolverVaryFilter` frå dette prosjektet til å legge til Vary header på alle responser for å unngå potensielle cache feil som følge av dynamisk serialisering.
 
 
 ### Bruk eigen OpenApiResource
