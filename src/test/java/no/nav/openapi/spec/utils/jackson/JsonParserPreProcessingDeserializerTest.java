@@ -93,7 +93,6 @@ public class JsonParserPreProcessingDeserializerTest {
         final var inp = ObjectAnnotatedEnum.VALUE_B;
         final ObjectMapper om = ObjectMapperFactory.createJson();
         final SimpleModule mod = new SimpleModule();
-        // Add deserializermodifier with incorrect propertyName. Will always fail
         mod.setDeserializerModifier(new JsonParserPreProcessingDeserializerModifier(new ObjectToPropertyPreProcessor(SomeInterface.class, "codeValue")));
         om.registerModule(mod);
         final String jsonStr = om.writeValueAsString(inp);
