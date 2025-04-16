@@ -42,7 +42,7 @@ public class JsonParserPreProcessingDeserializerTest {
                 ValueAnnotatedEnum.VALUE_B,
                 UnAnnotatedEnum.VALUE_A,
                 ObjectAnnotatedEnum.VALUE_A,
-                new OtherData("aaa", 111),
+                new OtherData("aaa", 111, null),
                 List.of(ValueAnnotatedEnum.VALUE_A, ValueAnnotatedEnum.VALUE_B),
                 new NotEnumCodeValue("txt for vvvv", "vvvv")
         );
