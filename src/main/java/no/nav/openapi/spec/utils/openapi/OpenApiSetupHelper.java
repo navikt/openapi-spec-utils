@@ -80,7 +80,11 @@ public class OpenApiSetupHelper {
     protected OpenAPI createWithCustomizations(final OpenAPIConfiguration baseConfig) throws OpenApiConfigurationException {
         final var context = this.buildContext(baseConfig);
         // EnumVarnamesConverter legger til x-enum-varnames for property namn på genererte enum objekt.
-        context.setModelConverters(Set.of(new EnumVarnamesConverter(this.objectMapper())));
+        // TimeTypesModelConverter konverterer Duration til OpenAPI string med format "duration".
+        context.setModelConverters(Set.of(
+                new EnumVarnamesConverter(this.objectMapper()),
+                new TimeTypesModelConverter(this.objectMapper())
+        ));
         // Konverter og rename enums, legg til nullable på Optional returtyper:
         final var optionalResponseTypeAdjustingReader = new OptionalResponseTypeAdjustingReader(baseConfig);
         optionalResponseTypeAdjustingReader.setApplication(this.application); // <- Nødvendig for at @ApplicationPath skal få effekt
