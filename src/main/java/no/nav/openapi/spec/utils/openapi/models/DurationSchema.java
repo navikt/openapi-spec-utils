@@ -37,13 +37,12 @@ public class DurationSchema extends Schema<Duration> {
     @Override
     protected Duration cast(Object value) {
         if (value != null) {
-            try {
-                if (value instanceof Duration) {
-                    return (Duration) value;
-                } else if (value instanceof String) {
-                    return Duration.parse((String) value);
-                }
-            } catch (Exception e) {
+            if (value instanceof Duration) {
+                return (Duration) value;
+            } else if (value instanceof String) {
+                return Duration.parse((String) value);
+            } else {
+                throw new ClassCastException("Cannot cast " + value.getClass() + " to Duration");
             }
         }
         return null;
