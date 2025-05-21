@@ -7,22 +7,30 @@ import io.swagger.v3.core.converter.ModelConverter;
 import io.swagger.v3.core.converter.ModelConverterContext;
 import io.swagger.v3.oas.models.media.Schema;
 import no.nav.openapi.spec.utils.openapi.models.DurationSchema;
+import no.nav.openapi.spec.utils.openapi.models.YearMonthSchema;
 
 import java.time.Duration;
+import java.time.YearMonth;
 import java.util.Iterator;
 
 /**
- * Overstyrer standard openapi spesifikasjonsgenerering for Duration verdier.
+ * Overstyrer standard openapi spesifikasjonsgenerering for java.time.* verdier.
  * <p>
- * Duration verdier blir i utgangspunktet definert som object i openapi spesifikasjonen, med alle interne properties
- * spesifisert. Dette stemmer ikkje med faktisk serialisering/deserialisering, som med SerializationFeature.WRITE_DURATIONS_AS_TIMESTAMPS
- * disabled i ObjectMapper vil (de)serialisere Duration frå/til ISO-8601 string.
+ * swagger openapi generator har ikkje spesiell støtte for java.time.* typer. Openapi spesifikasjon for disse blir derfor
+ * i utgangspunktet generert som object med alle interne properties spesifisert. Dette stemmer ikkje med faktisk
+ * (de)serialisering i jackson når ObjectMapper er konfigurert til å bruke JavaTimeModule. Då blir disse (de)serialisert
+ * som string.
  * <p>
- * Denne ModelConverter overstyrer openapi spesifikasjonsgenerering av Duration til å bli string type med format "duration".
- * Henta frå <a href="https://github.com/swagger-api/swagger-core/issues/2784#issuecomment-388325057">...</a>
+ * Meir spesifikt blir java.time.Duration verdier, når SerializationFeature.WRITE_DURATIONS_AS_TIMESTAMPS er disabled i
+ * ObjectMapper, (de)serialisert frå/til ISO-8601 string.
  * <p>
- * Den er navngitt TimeTypesModelConverter sidan det kanskje vil vere aktuelt å legge til kode for fleire typer som har
- * med tid å gjere seinare, ved behov.
+ * Denne ModelConverter overstyrer derfor openapi spesifikasjonsgenerering av nokre java.time.* typer med å spesifisere
+ * returnere Schema instanser for disse, som igjen spesifiserer type og format som stemmer med det jackson ObjectMapper
+ * er satt opp til.
+ * <p>
+ * Inspirasjon for denne er henta frå <a href="https://github.com/swagger-api/swagger-core/issues/2784#issuecomment-388325057">...</a>
+ * <p>
+ * Fleire spesialiserte Schema klasser, for andre java.time.* typer kan legges til her seinare, ved behov.
  */
 public class TimeTypesModelConverter implements ModelConverter {
     private final ObjectMapper objectMapper;
@@ -39,6 +47,9 @@ public class TimeTypesModelConverter implements ModelConverter {
                 final Class<?> cls = javaType.getRawClass();
                 if(Duration.class.isAssignableFrom(cls)) {
                     return new DurationSchema();
+                }
+                if(YearMonth.class.isAssignableFrom(cls)) {
+                    return new YearMonthSchema();
                 }
             }
         }
