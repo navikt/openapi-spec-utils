@@ -35,7 +35,7 @@ public class OpenapiGenerateTest {
         assertThat(schemas).containsKey("DummyDto");
         final var dummyDto = schemas.get("DummyDto");
         Map<String, Schema> properties = dummyDto.getProperties();
-        assertThat(properties).containsKeys("nummerProperty", "tekstProperty", "enumProperty", "durationProperty");
+        assertThat(properties).containsKeys("nummerProperty", "tekstProperty", "enumProperty", "durationProperty", "yearMonthProperty");
         assertThat(properties.get("nummerProperty").getType()).isEqualTo("integer");
         assertThat(properties.get("tekstProperty").getType()).isEqualTo("string");
         // Sjekk at reskriving til å ha enums som refs fungerte
@@ -56,6 +56,9 @@ public class OpenapiGenerateTest {
         }
         assertThat(properties.get("durationProperty").getType()).isEqualTo("string");
         assertThat(properties.get("durationProperty").getFormat()).isEqualTo("duration");
+
+        assertThat(properties.get("yearMonthProperty").getType()).isEqualTo("string");
+        assertThat(properties.get("yearMonthProperty").getFormat()).isEqualTo("year-month");
     }
 
     @Test
