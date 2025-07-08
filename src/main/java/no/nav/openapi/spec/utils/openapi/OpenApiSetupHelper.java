@@ -1,6 +1,7 @@
 package no.nav.openapi.spec.utils.openapi;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.swagger.v3.core.converter.ModelConverter;
 import io.swagger.v3.core.util.ObjectMapperFactory;
 import io.swagger.v3.jaxrs2.integration.JaxrsOpenApiContextBuilder;
 import io.swagger.v3.oas.integration.OpenApiConfigurationException;
@@ -12,10 +13,7 @@ import io.swagger.v3.oas.models.info.Info;
 import io.swagger.v3.oas.models.servers.Server;
 import jakarta.ws.rs.core.Application;
 
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 
 public class OpenApiSetupHelper {
     private final Application application;
@@ -24,6 +22,7 @@ public class OpenApiSetupHelper {
     private String scannerClass = "io.swagger.v3.jaxrs2.integration.JaxrsAnnotationScanner";
     private final Set<String> resourcePackages = new HashSet<String>();
     private final Set<String> resourceClasses = new HashSet<String>();
+    private final Set<Class<?>> registeredSubTypes = new LinkedHashSet<>();
 
     public OpenApiSetupHelper(
             final Application application,
@@ -54,6 +53,14 @@ public class OpenApiSetupHelper {
         return Collections.unmodifiableSet(this.resourceClasses);
     }
 
+    /**
+     * Classes manually registered into ObjectMapper should be added here too. {@link OneOfSubtypesModelConverter} will then
+     * do its thing when appropriate.
+     */
+    public void registerSubTypes(final Collection<Class<?>> subtypes) {
+        this.registeredSubTypes.addAll(subtypes);
+    }
+
     protected ObjectMapper objectMapper() {
         return ObjectMapperFactory.createJson();
     }
@@ -79,15 +86,17 @@ public class OpenApiSetupHelper {
 
     protected OpenAPI createWithCustomizations(final OpenAPIConfiguration baseConfig) throws OpenApiConfigurationException {
         final var context = this.buildContext(baseConfig);
-        // EnumVarnamesConverter legger til x-enum-varnames for property namn på genererte enum objekt.
-        // TimeTypesModelConverter konverterer Duration til OpenAPI string med format "duration".
-        context.setModelConverters(Set.of(
-                new EnumVarnamesConverter(this.objectMapper()),
-                new TimeTypesModelConverter(this.objectMapper())
-        ));
-        // Konverter og rename enums, legg til nullable på Optional returtyper:
+        final Set<ModelConverter> modelConverters = new LinkedHashSet<>(3);
+        // EnumVarnamesConverter adds x-enum-varnames for property name on generated enum objects.
+        modelConverters.add(new EnumVarnamesConverter(this.objectMapper()));
+        // TimeTypesModelConverter converts Duration to OpenAPI string with format "duration".
+        modelConverters.add(new TimeTypesModelConverter(this.objectMapper()));
+        // OneOfSubtypeModelConverter automatically adds @Schema(oneOf ...) for registeredSubtypes
+        modelConverters.add(new OneOfSubtypesModelConverter(this.registeredSubTypes));
+        context.setModelConverters(modelConverters);
+        // Convert and rename enums, add nullable on Optional returntypes:
         final var optionalResponseTypeAdjustingReader = new OptionalResponseTypeAdjustingReader(baseConfig);
-        optionalResponseTypeAdjustingReader.setApplication(this.application); // <- Nødvendig for at @ApplicationPath skal få effekt
+        optionalResponseTypeAdjustingReader.setApplication(this.application); // <- Neccessary for @ApplicationPath to have effect
         context.setOpenApiReader(new ConvertEnumsToRefsWrappingReader(optionalResponseTypeAdjustingReader));
         context.init();
         return context.read();

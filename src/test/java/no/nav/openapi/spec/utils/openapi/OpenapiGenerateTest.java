@@ -6,11 +6,17 @@ import io.swagger.v3.oas.models.Paths;
 import io.swagger.v3.oas.models.info.Info;
 import io.swagger.v3.oas.models.media.Schema;
 import io.swagger.v3.oas.models.servers.Server;
+import no.nav.openapi.spec.utils.jackson.dto.SomeExtensionClassA;
+import no.nav.openapi.spec.utils.jackson.dto.SomeExtensionClassB;
 import org.junit.jupiter.api.Test;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.fail;
@@ -19,8 +25,9 @@ public class OpenapiGenerateTest {
 
     private OpenAPI resolveDummyOpenApi() throws OpenApiConfigurationException {
         final var setupHelper = new OpenApiSetupHelper(new DummyApplication(), new Info(), new Server());
+        setupHelper.addResourcePackage("no.nav.openapi.spec.utils"); // Prevents scanner from including classes outside this package
         setupHelper.addResourceClass(DummyRestService.class.getCanonicalName());
-        setupHelper.addResourceClass(DummyApplication.class.getCanonicalName());
+        setupHelper.registerSubTypes(Set.of(SomeExtensionClassB.class, SomeExtensionClassA.class));
         return setupHelper.resolveOpenAPI();
     }
 
@@ -59,6 +66,20 @@ public class OpenapiGenerateTest {
 
         assertThat(properties.get("yearMonthProperty").getType()).isEqualTo("string");
         assertThat(properties.get("yearMonthProperty").getFormat()).isEqualTo("year-month");
+
+        // Check that automatic resolving of subtypes has worked:
+        assertThat(schemas).containsKeys("SomeExtensionClassA", "SomeExtensionClassB");
+    }
+
+    @Test
+    public void testFileOutputter() throws IOException, OpenApiConfigurationException {
+        final var resolvedDummyOpenApi = resolveDummyOpenApi();
+        final var filePath = "/tmp/openapi-spec-utils-testfile.json";
+        FileOutputter.writeJsonFile(resolvedDummyOpenApi, filePath);
+        final var fileContent = Files.readString(Path.of(filePath));
+        assertThat(fileContent.length()).isGreaterThan(400);
+        assertThat(fileContent.length()).isLessThan(4000000);
+        assertThat(fileContent).contains("nummerProperty");
     }
 
     @Test

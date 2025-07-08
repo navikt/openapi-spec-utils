@@ -1,5 +1,8 @@
 package no.nav.openapi.spec.utils.openapi;
 
+import no.nav.openapi.spec.utils.jackson.dto.SomeAbstractClass;
+import no.nav.openapi.spec.utils.jackson.dto.SomeExtensionClassA;
+
 import java.time.Duration;
 import java.time.YearMonth;
 
@@ -12,4 +15,9 @@ public class DummyDto {
     public DummyEnum enumProperty = DummyEnum.DUMMY_V1;
     public Duration durationProperty = Duration.parse("P20DT1H13S");
     public YearMonth yearMonthProperty = YearMonth.parse("2023-10");
+//  OneOfSubtypesModelConverter will autopmatically create @Schema annotation as declared below, since SomeExtensionClassX
+//  is added to OpenApiSetupHelper registeredSubTypes. This is therefore commented out here just to show what would otherwise
+//  be needed:
+//  @Schema(oneOf = {SomeExtensionClassA.class, SomeExtensionClassB.class})
+    public SomeAbstractClass abstractClass = new SomeExtensionClassA();
 }
