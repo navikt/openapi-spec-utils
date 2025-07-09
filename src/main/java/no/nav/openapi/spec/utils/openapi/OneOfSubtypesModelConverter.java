@@ -241,7 +241,7 @@ public class OneOfSubtypesModelConverter implements ModelConverter {
 
             @Override
             public boolean enumAsRef() {
-                return false;
+                return true;
             }
 
             @Override
