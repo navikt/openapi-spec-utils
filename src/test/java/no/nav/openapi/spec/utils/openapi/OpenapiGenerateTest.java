@@ -14,9 +14,9 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Function;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.fail;
@@ -36,17 +36,20 @@ public class OpenapiGenerateTest {
         // Generer først openapi spesifikasjon basert på dummy klasser deklarert i denne test-pakke.
         final var openapi = resolveDummyOpenApi();
 
+        // Helper function that creates expected names dynamically based on useFqn argument
+        final Function<Class<?>, String> makeName = cls -> cls.getName();
+
         // Sjekk at generert spesifikasjon er som forventa
         assertThat(openapi).isNotNull();
         var schemas = openapi.getComponents().getSchemas();
-        assertThat(schemas).containsKey("DummyDto");
-        final var dummyDto = schemas.get("DummyDto");
+        assertThat(schemas).containsKey(makeName.apply(DummyDto.class));
+        final var dummyDto = schemas.get(makeName.apply(DummyDto.class));
         Map<String, Schema> properties = dummyDto.getProperties();
         assertThat(properties).containsKeys("nummerProperty", "tekstProperty", "enumProperty", "durationProperty", "yearMonthProperty");
         assertThat(properties.get("nummerProperty").getType()).isEqualTo("integer");
         assertThat(properties.get("tekstProperty").getType()).isEqualTo("string");
         // Sjekk at reskriving til å ha enums som refs fungerte
-        final String expectedDummyEnumName = "DummyDtoEnumProperty";
+        final String expectedDummyEnumName = makeName.apply(DummyEnum.class);
         final String expectedDummyEnumRef = "#/components/schemas/" + expectedDummyEnumName;
         assertThat(properties.get("enumProperty").get$ref()).isEqualTo(expectedDummyEnumRef);
         assertThat(schemas).containsKey(expectedDummyEnumName);
@@ -55,8 +58,7 @@ public class OpenapiGenerateTest {
         final var dummyEnumValues = dummyEnum.getEnum();
         assertThat(dummyEnumValues).containsExactlyInAnyOrderElementsOf(Arrays.stream(DummyEnum.values()).map(v -> v.enumVerdi).toList());
         final var dummyEnumNames = dummyEnum.getExtensions().get("x-enum-varnames");
-        if(dummyEnumNames instanceof List) {
-            final List<String> names = (List<String>) dummyEnumNames;
+        if(dummyEnumNames instanceof String[] names) {
             assertThat(names).containsExactlyInAnyOrderElementsOf(Arrays.stream(DummyEnum.values()).map(v -> v.name()).toList());
         } else {
             fail();
@@ -68,7 +70,7 @@ public class OpenapiGenerateTest {
         assertThat(properties.get("yearMonthProperty").getFormat()).isEqualTo("year-month");
 
         // Check that automatic resolving of subtypes has worked:
-        assertThat(schemas).containsKeys("SomeExtensionClassA", "SomeExtensionClassB");
+        assertThat(schemas).containsKeys(makeName.apply(SomeExtensionClassA.class), makeName.apply(SomeExtensionClassB.class));
     }
 
     @Test

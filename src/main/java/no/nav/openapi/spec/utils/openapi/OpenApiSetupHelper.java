@@ -1,8 +1,9 @@
 package no.nav.openapi.spec.utils.openapi;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import io.swagger.v3.core.converter.ModelConverter;
-import io.swagger.v3.core.util.ObjectMapperFactory;
+import io.swagger.v3.core.converter.ModelConverters;
+import io.swagger.v3.core.jackson.ModelResolver;
+import io.swagger.v3.core.jackson.TypeNameResolver;
 import io.swagger.v3.jaxrs2.integration.JaxrsOpenApiContextBuilder;
 import io.swagger.v3.oas.integration.OpenApiConfigurationException;
 import io.swagger.v3.oas.integration.SwaggerConfiguration;
@@ -61,10 +62,6 @@ public class OpenApiSetupHelper {
         this.registeredSubTypes.addAll(subtypes);
     }
 
-    protected ObjectMapper objectMapper() {
-        return ObjectMapperFactory.createJson();
-    }
-
     protected OpenAPIConfiguration initBaseConfig()  {
         final OpenAPI oas = new OpenAPI();
         oas.info(this.info);
@@ -77,8 +74,13 @@ public class OpenApiSetupHelper {
                 .resourcePackages(this.resourcePackages);
     }
 
+    private String makeRandomId() {
+        return UUID.randomUUID().toString();
+    }
+
     protected OpenApiContext buildContext(final OpenAPIConfiguration baseConfig) throws OpenApiConfigurationException {
         return new JaxrsOpenApiContextBuilder<>()
+                .ctxId(makeRandomId()) // Use new random ctxId each time to avoid caching
                 .application(this.application)
                 .openApiConfiguration(baseConfig)
                 .buildContext(false);
@@ -86,18 +88,24 @@ public class OpenApiSetupHelper {
 
     protected OpenAPI createWithCustomizations(final OpenAPIConfiguration baseConfig) throws OpenApiConfigurationException {
         final var context = this.buildContext(baseConfig);
-        final Set<ModelConverter> modelConverters = new LinkedHashSet<>(3);
+        final Set<ModelConverter> modelConverters = new LinkedHashSet<>(4);
         // EnumVarnamesConverter adds x-enum-varnames for property name on generated enum objects.
-        modelConverters.add(new EnumVarnamesConverter(this.objectMapper()));
+        modelConverters.add(new EnumVarnamesConverter());
         // TimeTypesModelConverter converts Duration to OpenAPI string with format "duration".
-        modelConverters.add(new TimeTypesModelConverter(this.objectMapper()));
+        modelConverters.add(new TimeTypesModelConverter());
         // OneOfSubtypeModelConverter automatically adds @Schema(oneOf ...) for registeredSubtypes
-        modelConverters.add(new OneOfSubtypesModelConverter(this.registeredSubTypes));
+        if(!this.registeredSubTypes.isEmpty()) {
+            modelConverters.add(new OneOfSubtypesModelConverter(this.registeredSubTypes));
+        }
+        // If context has been built before, we need to  reset ModelConverters for changes in it (or TypeNameResolver.std) to take effect
+        ModelConverters.reset();
+        ModelResolver.enumsAsRef = true;
+        TypeNameResolver.std.setUseFqn(true);
         context.setModelConverters(modelConverters);
         // Convert and rename enums, add nullable on Optional returntypes:
         final var optionalResponseTypeAdjustingReader = new OptionalResponseTypeAdjustingReader(baseConfig);
         optionalResponseTypeAdjustingReader.setApplication(this.application); // <- Neccessary for @ApplicationPath to have effect
-        context.setOpenApiReader(new ConvertEnumsToRefsWrappingReader(optionalResponseTypeAdjustingReader));
+        context.setOpenApiReader(optionalResponseTypeAdjustingReader);
         context.init();
         return context.read();
     }
