@@ -76,7 +76,11 @@ public class OpenApiSetupHelper {
     }
 
     protected ObjectMapper objectMapper() {
-        return ObjectMapperFactory.createJson();
+        final var om = ObjectMapperFactory.createJson();
+        // Hack to make the OneOfSubtypesModelConverter work properly when @JsonSubTypes has been declared.
+        // TODO Cleanup this
+        om.setAnnotationIntrospector(new NoJsonSubTypesAnnotationIntrospector());
+        return om;
     }
 
     protected OpenAPIConfiguration initBaseConfig()  {
@@ -118,9 +122,7 @@ public class OpenApiSetupHelper {
         // TimeTypesModelConverter converts Duration to OpenAPI string with format "duration".
         modelConverters.add(new TimeTypesModelConverter());
         // OneOfSubtypeModelConverter automatically adds @Schema(oneOf ...) for registeredSubtypes
-        if(!this.registeredSubTypes.isEmpty()) {
-            modelConverters.add(new OneOfSubtypesModelConverter(this.registeredSubTypes));
-        }
+        modelConverters.add(new OneOfSubtypesModelConverter(this.registeredSubTypes));
         context.setModelConverters(modelConverters);
         // Convert and rename enums, add nullable on Optional returntypes:
         final var optionalResponseTypeAdjustingReader = new OptionalResponseTypeAdjustingReader(baseConfig);
