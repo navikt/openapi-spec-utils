@@ -1,6 +1,10 @@
 package no.nav.openapi.spec.utils.openapi;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.swagger.v3.core.converter.ModelConverter;
+import io.swagger.v3.core.converter.ModelConverters;
+import io.swagger.v3.core.jackson.ModelResolver;
+import io.swagger.v3.core.jackson.TypeNameResolver;
 import io.swagger.v3.core.util.ObjectMapperFactory;
 import io.swagger.v3.jaxrs2.integration.JaxrsOpenApiContextBuilder;
 import io.swagger.v3.oas.integration.OpenApiConfigurationException;
@@ -12,10 +16,7 @@ import io.swagger.v3.oas.models.info.Info;
 import io.swagger.v3.oas.models.servers.Server;
 import jakarta.ws.rs.core.Application;
 
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 
 public class OpenApiSetupHelper {
     private final Application application;
@@ -24,6 +25,8 @@ public class OpenApiSetupHelper {
     private String scannerClass = "io.swagger.v3.jaxrs2.integration.JaxrsAnnotationScanner";
     private final Set<String> resourcePackages = new HashSet<String>();
     private final Set<String> resourceClasses = new HashSet<String>();
+    private final Set<Class<?>> registeredSubTypes = new LinkedHashSet<>();
+    private TypeNameResolver typeNameResolver = TypeNameResolver.std;
 
     public OpenApiSetupHelper(
             final Application application,
@@ -33,6 +36,7 @@ public class OpenApiSetupHelper {
         this.application = Objects.requireNonNull(application);
         this.info = Objects.requireNonNull(info);
         this.server = Objects.requireNonNull(server);
+        typeNameResolver.setUseFqn(true);
     }
 
     public void setScannerClass(final String scannerClass) {
@@ -54,8 +58,29 @@ public class OpenApiSetupHelper {
         return Collections.unmodifiableSet(this.resourceClasses);
     }
 
+    /**
+     * Classes manually registered into ObjectMapper should be added here too. {@link OneOfSubtypesModelConverter} will then
+     * do its thing when appropriate.
+     */
+    public void registerSubTypes(final Collection<Class<?>> subtypes) {
+        this.registeredSubTypes.addAll(subtypes);
+    }
+
+    /**
+     * Use this to set a custom typename resolver to be used when resolveOpenAPI is run.
+     * By passing an instance of {@link PrefixStrippingFQNTypeNameResolver}, one can shorten the default fully qualified
+     * names by stripping away long package prefixes.
+     */
+    public void setTypeNameResolver(final TypeNameResolver typeNameResolver) {
+        this.typeNameResolver = typeNameResolver;
+    }
+
     protected ObjectMapper objectMapper() {
-        return ObjectMapperFactory.createJson();
+        final var om = ObjectMapperFactory.createJson();
+        // Hack to make the OneOfSubtypesModelConverter work properly when @JsonSubTypes has been declared.
+        // TODO Cleanup this
+        om.setAnnotationIntrospector(new NoJsonSubTypesAnnotationIntrospector());
+        return om;
     }
 
     protected OpenAPIConfiguration initBaseConfig()  {
@@ -70,25 +95,39 @@ public class OpenApiSetupHelper {
                 .resourcePackages(this.resourcePackages);
     }
 
+    private String makeRandomId() {
+        return UUID.randomUUID().toString();
+    }
+
     protected OpenApiContext buildContext(final OpenAPIConfiguration baseConfig) throws OpenApiConfigurationException {
         return new JaxrsOpenApiContextBuilder<>()
+                .ctxId(makeRandomId()) // Use new random ctxId each time to avoid caching
                 .application(this.application)
                 .openApiConfiguration(baseConfig)
                 .buildContext(false);
     }
 
     protected OpenAPI createWithCustomizations(final OpenAPIConfiguration baseConfig) throws OpenApiConfigurationException {
+        // If context has been built before, we need to  reset ModelConverters for changes in it (or TypeNameResolver.std) to take effect
+        ModelConverters.reset();
+        // We want all enums to be separated out as ref types:
+        ModelResolver.enumsAsRef = true;
         final var context = this.buildContext(baseConfig);
-        // EnumVarnamesConverter legger til x-enum-varnames for property namn på genererte enum objekt.
-        // TimeTypesModelConverter konverterer Duration til OpenAPI string med format "duration".
-        context.setModelConverters(Set.of(
-                new EnumVarnamesConverter(this.objectMapper()),
-                new TimeTypesModelConverter(this.objectMapper())
-        ));
-        // Konverter og rename enums, legg til nullable på Optional returtyper:
+        final Set<ModelConverter> modelConverters = new LinkedHashSet<>(4);
+        // Add base ModelResolver with typeNameResolver set on this helper.
+        // This must be added first, so that it ends up last in the converter chain
+        modelConverters.add(new ModelResolver(this.objectMapper(), this.typeNameResolver));
+        // EnumVarnamesConverter adds x-enum-varnames for property name on generated enum objects.
+        modelConverters.add(new EnumVarnamesConverter());
+        // TimeTypesModelConverter converts Duration to OpenAPI string with format "duration".
+        modelConverters.add(new TimeTypesModelConverter());
+        // OneOfSubtypeModelConverter automatically adds @Schema(oneOf ...) for registeredSubtypes
+        modelConverters.add(new OneOfSubtypesModelConverter(this.registeredSubTypes));
+        context.setModelConverters(modelConverters);
+        // Convert and rename enums, add nullable on Optional returntypes:
         final var optionalResponseTypeAdjustingReader = new OptionalResponseTypeAdjustingReader(baseConfig);
-        optionalResponseTypeAdjustingReader.setApplication(this.application); // <- Nødvendig for at @ApplicationPath skal få effekt
-        context.setOpenApiReader(new ConvertEnumsToRefsWrappingReader(optionalResponseTypeAdjustingReader));
+        optionalResponseTypeAdjustingReader.setApplication(this.application); // <- Neccessary for @ApplicationPath to have effect
+        context.setOpenApiReader(optionalResponseTypeAdjustingReader);
         context.init();
         return context.read();
     }

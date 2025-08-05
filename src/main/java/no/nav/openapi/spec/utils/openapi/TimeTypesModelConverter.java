@@ -1,7 +1,6 @@
 package no.nav.openapi.spec.utils.openapi;
 
-import com.fasterxml.jackson.databind.JavaType;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.type.SimpleType;
 import io.swagger.v3.core.converter.AnnotatedType;
 import io.swagger.v3.core.converter.ModelConverter;
 import io.swagger.v3.core.converter.ModelConverterContext;
@@ -33,18 +32,14 @@ import java.util.Iterator;
  * Fleire spesialiserte Schema klasser, for andre java.time.* typer kan legges til her seinare, ved behov.
  */
 public class TimeTypesModelConverter implements ModelConverter {
-    private final ObjectMapper objectMapper;
-
-    public TimeTypesModelConverter(final ObjectMapper objectMapper) {
-        this.objectMapper = objectMapper;
+    public TimeTypesModelConverter() {
     }
 
     @Override
     public Schema<?> resolve(AnnotatedType type, ModelConverterContext context, Iterator<ModelConverter> chain) {
         if(type.isSchemaProperty()) {
-            final JavaType javaType = this.objectMapper.constructType(type.getType());
-            if(javaType != null) {
-                final Class<?> cls = javaType.getRawClass();
+            if(type.getType() != null && type.getType() instanceof SimpleType simpleType) {
+                final Class<?> cls = simpleType.getRawClass();
                 if(Duration.class.isAssignableFrom(cls)) {
                     return new DurationSchema();
                 }

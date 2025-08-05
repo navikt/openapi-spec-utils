@@ -4,12 +4,6 @@ on:
   push:
     branches:
       - '**'
-    paths-ignore:
-      - '**.md'
-      - '**.MD'
-      - '.gitignore'
-      - 'LICENSE'
-      - 'CODEOWNERS'
 
 jobs:
   build:
