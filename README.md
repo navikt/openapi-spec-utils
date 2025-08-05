@@ -56,11 +56,17 @@ For at kodegenerering i neste omgang (https://github.com/navikt/openapi-ts-clien
 1. Flytt enums ut til å vere separate refs, med namn bygd opp av klassenamn + propertynamn. Dette er nødvendig for å få gode typenamn på enums, og sikrer at ein unngår namnekollisjoner når ein har fleire properties (på ulike dto klasser) som har samme namn, men held på ulike enum typer.
 2. Generer x-enum-varnames tillegg på alle enums, slik at property namn på generert javascript objekt blir det samme som på java enum.
 
-Punkt 1 løysast ved å bruke `ConvertEnumsToRefsWrappingReader` klassen.
+Punkt 1 løysast ved å sette `ModelResolver.enumsAsref` true i OpenApiSetupHelper.
 Punkt 2 løysast ved å legge til ein instans av `EnumVarnamesConverter` som ModelConverter før generering av OpenAPI objektet.
 
 #### nullable respons for Optional
 Vi ønsker at ein metode som returnerer Optional<T> skal ha nullable i generert OpenAPI spesifikasjon. Dette løysast ved å bruke `OptionalResponseTypeAdjustingReader` klassen.
+
+#### fully qualified type names
+Vi ønsker at typenamn i generert openapi spesifikasjon inkluderer pakkenamn, slik at vi unngår kollisjoner sjølv om det er fleire klasser med samme namn (frå ulike pakker) i spesifikasjonen.
+
+#### automatiske subtyper for abstrakte klasser
+OpenApiSetupHelper har støtte for å automatisk legge til "@Schema(oneOf = ...)" annotasjoner for abstrakte klasser, når subtyper er registrert med metoden `registerSubTypes`. På denne måten får vi generert gode openapi typer for abstrakte klasser uten å måtte manuelt kode alle konkrete subtyper inn i @Schema(oneOf) annotasjon.
 
 **Bruk `OpenApiSetupHelper` for å få generert ein `OpenAPI` spesifikasjon med disse tilpasninger på plass.**
 
