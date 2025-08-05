@@ -72,7 +72,7 @@ public class OpenapiGenerateTest {
         assertThat(dummyEnumValues).containsExactlyInAnyOrderElementsOf(Arrays.stream(DummyEnum.values()).map(v -> v.enumVerdi).toList());
         final var dummyEnumNames = dummyEnum.getExtensions().get("x-enum-varnames");
         if(dummyEnumNames instanceof String[] names) {
-            assertThat(names).containsExactlyInAnyOrderElementsOf(Arrays.stream(DummyEnum.values()).map(v -> v.name()).toList());
+            assertThat(names).containsExactlyElementsOf(Arrays.stream(DummyEnum.values()).map(v -> v.name()).toList());
         } else {
             fail();
         }
@@ -90,7 +90,7 @@ public class OpenapiGenerateTest {
             final var abstractClass = schemas.get(makeName.apply(SomeAbstractClass.class));
             final List<Schema> oneOf = abstractClass.getOneOf();
             final var refs = oneOf.stream().map(s -> s.get$ref()).toList();
-            assertThat(refs).containsExactlyInAnyOrder(componentRef(makeName.apply(SomeExtensionClassA.class)), componentRef(makeName.apply(SomeExtensionClassB.class)));
+            assertThat(refs).containsExactly(componentRef(makeName.apply(SomeExtensionClassA.class)), componentRef(makeName.apply(SomeExtensionClassB.class)));
         }
         {
             final var someExtensionClassA = schemas.get(makeName.apply(SomeExtensionClassA.class));

@@ -55,8 +55,9 @@ public class OneOfSubtypesModelConverter implements ModelConverter {
 
             @Override
             public Class<?>[] oneOf() {
-                final var ret = new Class<?>[oneOf.size()];
-                return oneOf.toArray(ret);
+                return oneOf.stream()
+                        .sorted((a, b) -> a.getCanonicalName().compareTo(b.getCanonicalName()))
+                        .toArray(Class<?>[]::new);
             }
 
             @Override
