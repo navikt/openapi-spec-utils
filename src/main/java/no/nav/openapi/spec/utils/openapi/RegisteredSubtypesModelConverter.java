@@ -13,7 +13,7 @@ import java.util.stream.Collectors;
  * When the type to resolve is an abstract class without any @Schema annotation, and registeredSubtypes has one or more
  * classes that are subtypes of the type, this will automatically add a @Schema annotation with "oneOf" set to all
  * registered matching subtypes to the type to resolve. When it is then resolved further by the chain, this leads to
- * all matching subtypes being declared as possitble "oneOf" values.
+ * all matching subtypes being declared as possible "oneOf" values.
  * <br>
  * Used so that we can avoid manually having to hardcode the @Schema(oneOf = ...) annotation.
  */
@@ -32,7 +32,6 @@ public class RegisteredSubtypesModelConverter implements ModelConverter {
                     if (simpleType.isAbstract() && !simpleType.isFinal()) { // Only add registeredSubtypes to abstract non-final types
                         final Class<?> cls = simpleType.getRawClass();
                         // Resolve current schema annotation from context (if set there) and type.
-                        // contextWins is not used in the base ModelResolver, but think it is correct to use here.
                         final var incomingSchemaAnnotation = AnnotationUtils.resolveIncomingSchemaAnnotation(type.getCtxAnnotations(), simpleType);
                         if (!AnnotationUtils.hasOneOfSchema(incomingSchemaAnnotation)) {
                             // Create schema with oneOf for the current type based on registeredSubTypes
