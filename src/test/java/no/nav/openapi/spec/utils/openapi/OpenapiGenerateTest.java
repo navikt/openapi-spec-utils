@@ -6,9 +6,7 @@ import io.swagger.v3.oas.models.Paths;
 import io.swagger.v3.oas.models.info.Info;
 import io.swagger.v3.oas.models.media.Schema;
 import io.swagger.v3.oas.models.servers.Server;
-import no.nav.openapi.spec.utils.jackson.dto.SomeAbstractClass;
-import no.nav.openapi.spec.utils.jackson.dto.SomeExtensionClassA;
-import no.nav.openapi.spec.utils.jackson.dto.SomeExtensionClassB;
+import no.nav.openapi.spec.utils.jackson.dto.*;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
@@ -32,7 +30,7 @@ public class OpenapiGenerateTest {
         final var setupHelper = new OpenApiSetupHelper(new DummyApplication(), new Info(), new Server());
         setupHelper.addResourcePackage("no.nav.openapi.spec.utils"); // Prevents scanner from including classes outside this package
         setupHelper.addResourceClass(DummyRestService.class.getCanonicalName());
-        setupHelper.registerSubTypes(Set.of(SomeExtensionClassB.class, SomeExtensionClassA.class));
+        setupHelper.registerSubTypes(Set.of(SomeExtensionClassB.class, SomeExtensionClassA.class)); // ActualWithSchema.class deliberately not registered here.
         if(stripTypeNamePrefixes) {
             setupHelper.setTypeNameResolver(new PrefixStrippingFQNTypeNameResolver(STRIP_TYPE_NAME_PREFIX));
         }
@@ -95,6 +93,18 @@ public class OpenapiGenerateTest {
         {
             final var someExtensionClassA = schemas.get(makeName.apply(SomeExtensionClassA.class));
             assertThat(someExtensionClassA.getAllOf()).isNull();
+        }
+        // Check that otherAbstractClass has oneOf set as desired
+        assertThat(properties.get("otherAbstractClass").get$ref()).isEqualTo(componentRef(makeName.apply(OtherAbstractClass.class)));
+        {
+            final var otherAbstractClass = schemas.get(makeName.apply(OtherAbstractClass.class));
+            final List<Schema> oneOf = otherAbstractClass.getOneOf();
+            final var refs = oneOf.stream().map(s -> s.get$ref()).toList();
+            assertThat(refs).containsExactly(componentRef(makeName.apply(OtherExtensionClassA.class)), componentRef(makeName.apply(OtherExtensionClassB.class)));
+        }
+        {
+            final var otherExtensionClassA = schemas.get(makeName.apply(OtherExtensionClassA.class));
+            assertThat(otherExtensionClassA.getAllOf()).isNull();
         }
     }
 
