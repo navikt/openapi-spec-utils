@@ -59,7 +59,7 @@ public class OpenApiSetupHelper {
     }
 
     /**
-     * Classes manually registered into ObjectMapper should be added here too. {@link OneOfSubtypesModelConverter} will then
+     * Classes manually registered into ObjectMapper should be added here too. {@link JsonSubTypesModelConverter} will then
      * do its thing when appropriate.
      */
     public void registerSubTypes(final Collection<Class<?>> subtypes) {
@@ -77,8 +77,8 @@ public class OpenApiSetupHelper {
 
     protected ObjectMapper objectMapper() {
         final var om = ObjectMapperFactory.createJson();
-        // Hack to make the OneOfSubtypesModelConverter work properly when @JsonSubTypes has been declared.
-        // TODO Cleanup this
+        // Remove all JsonSubTypes annotations from the objectmapper used in openapi creation. To avoid problem with
+        // allOf element being created on subtypes along with oneOf from JsonSubTypesModelConverter
         om.setAnnotationIntrospector(new NoJsonSubTypesAnnotationIntrospector());
         return om;
     }
@@ -113,7 +113,7 @@ public class OpenApiSetupHelper {
         // We want all enums to be separated out as ref types:
         ModelResolver.enumsAsRef = true;
         final var context = this.buildContext(baseConfig);
-        final Set<ModelConverter> modelConverters = new LinkedHashSet<>(4);
+        final Set<ModelConverter> modelConverters = new LinkedHashSet<>(5);
         // Add base ModelResolver with typeNameResolver set on this helper.
         // This must be added first, so that it ends up last in the converter chain
         modelConverters.add(new ModelResolver(this.objectMapper(), this.typeNameResolver));
@@ -121,8 +121,11 @@ public class OpenApiSetupHelper {
         modelConverters.add(new EnumVarnamesConverter());
         // TimeTypesModelConverter converts Duration to OpenAPI string with format "duration".
         modelConverters.add(new TimeTypesModelConverter());
-        // OneOfSubtypeModelConverter automatically adds @Schema(oneOf ...) for registeredSubtypes
-        modelConverters.add(new OneOfSubtypesModelConverter(this.registeredSubTypes));
+        // RegisteredSubtypeModelConverter automatically adds @Schema(oneOf ...) for registeredSubtypes
+        modelConverters.add(new RegisteredSubtypesModelConverter(this.registeredSubTypes));
+        // JsonSubTypesModelConverter automatically adds @Schema(oneOf ...) for subtypes declared in @JsonSubTypes.
+        // Should be added after RegisteredSubtypesModelConverter, so that it is before that in the resolver chain.
+        modelConverters.add(new JsonSubTypesModelConverter());
         context.setModelConverters(modelConverters);
         // Convert and rename enums, add nullable on Optional returntypes:
         final var optionalResponseTypeAdjustingReader = new OptionalResponseTypeAdjustingReader(baseConfig);
