@@ -30,7 +30,7 @@ public class OpenapiGenerateTest {
         final var setupHelper = new OpenApiSetupHelper(new DummyApplication(), new Info(), new Server());
         setupHelper.addResourcePackage("no.nav.openapi.spec.utils"); // Prevents scanner from including classes outside this package
         setupHelper.addResourceClass(DummyRestService.class.getCanonicalName());
-        setupHelper.registerSubTypes(Set.of(SomeExtensionClassB.class, SomeExtensionClassA.class));
+        setupHelper.registerSubTypes(Set.of(SomeExtensionClassB.class, SomeExtensionClassA.class)); // ActualWithSchema.class deliberately not registered here.
         if(stripTypeNamePrefixes) {
             setupHelper.setTypeNameResolver(new PrefixStrippingFQNTypeNameResolver(STRIP_TYPE_NAME_PREFIX));
         }

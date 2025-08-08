@@ -4,6 +4,8 @@ import io.swagger.v3.oas.annotations.Operation;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
+import no.nav.openapi.spec.utils.jackson.dto.AbstractWithSchema;
+import no.nav.openapi.spec.utils.jackson.dto.ActualWithSchema;
 import no.nav.openapi.spec.utils.jackson.dto.OtherData;
 
 /**
@@ -21,9 +23,9 @@ public class DummyRestService {
     }
 
     @POST
-    @Path("/other")
+    @Path("/abstract")
     @Operation(description = "reproduction of resolve loop issue")
-    public OtherData other() {
-        return new OtherData("", 1, 2);
+    public AbstractWithSchema other() {
+        return new ActualWithSchema();
     }
 }
