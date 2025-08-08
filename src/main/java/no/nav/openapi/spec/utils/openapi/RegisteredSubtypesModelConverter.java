@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.type.SimpleType;
 import io.swagger.v3.core.converter.AnnotatedType;
 import io.swagger.v3.core.converter.ModelConverter;
 import io.swagger.v3.core.converter.ModelConverterContext;
-import io.swagger.v3.core.util.AnnotationsUtils;
 import io.swagger.v3.oas.models.media.Schema;
 
 import java.util.*;
@@ -33,7 +32,7 @@ public class RegisteredSubtypesModelConverter implements ModelConverter {
                     final Class<?> cls = simpleType.getRawClass();
                     // Resolve current schema annotation from context (if set there) and type.
                     // contextWins is not used in the base ModelResolver, but think it is correct to use here.
-                    final var incomingSchemaAnnotation = AnnotationsUtils.mergeSchemaAnnotations(type.getCtxAnnotations(), simpleType, true);
+                    final var incomingSchemaAnnotation = AnnotationUtils.resolveIncomingSchemaAnnotation(type.getCtxAnnotations(), simpleType);
                     if(!AnnotationUtils.hasOneOfSchema(incomingSchemaAnnotation)) {
                         // Create schema with oneOf for the current type based on registeredSubTypes
                         final var subclasses = registeredSubtypes.stream().filter(cls::isAssignableFrom).collect(Collectors.toUnmodifiableSet());

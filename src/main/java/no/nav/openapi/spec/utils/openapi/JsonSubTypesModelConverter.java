@@ -61,7 +61,7 @@ public class JsonSubTypesModelConverter implements ModelConverter {
             if(type.isResolveAsRef() ) {
                 if(type.getType() instanceof SimpleType simpleType) {
                     final Class<?> cls = simpleType.getRawClass();
-                    final var incomingSchemaAnnotation = AnnotationsUtils.mergeSchemaAnnotations(type.getCtxAnnotations(), simpleType, true);
+                    final var incomingSchemaAnnotation = AnnotationUtils.resolveIncomingSchemaAnnotation(type.getCtxAnnotations(), simpleType);
                     if(!AnnotationUtils.hasOneOfSchema(incomingSchemaAnnotation)) {
                         // If class has @JsonSubTypes annotation, create @Schema(oneOf = ...) based on it and add it to type.ctxAnnotations
                         final var jsonSubtypesAnnotation = cls.getDeclaredAnnotation(JsonSubTypes.class);

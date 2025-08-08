@@ -1,5 +1,6 @@
 package no.nav.openapi.spec.utils.openapi;
 
+import com.fasterxml.jackson.databind.type.SimpleType;
 import io.swagger.v3.core.util.AnnotationsUtils;
 
 import java.lang.annotation.Annotation;
@@ -58,5 +59,23 @@ public class AnnotationUtils {
         }
         return list.toArray(new Annotation[]{});
     }
+
+    /**
+     * Resolves Schema annotation from incoming ctxAnnotations and/or the given type.
+     * If the incomingCtxAnnotations are equal to the newResolved, return incomingCtxAnnotations, to avoid creating new
+     * objects, that cause stackoverflow in the context.resolve code.
+     */
+    public static Annotation resolveIncomingSchemaAnnotation(final Annotation[] incomingCtxAnnotations, final SimpleType simpleType) {
+        final var newResolved = AnnotationsUtils.mergeSchemaAnnotations(incomingCtxAnnotations, simpleType, false);
+        Annotation incomingCtxSchemaAnnotation = AnnotationsUtils.getSchemaAnnotation(incomingCtxAnnotations);
+        if(incomingCtxSchemaAnnotation == null) {
+            incomingCtxSchemaAnnotation = AnnotationsUtils.getArraySchemaAnnotation(incomingCtxAnnotations);
+        }
+        if(incomingCtxSchemaAnnotation != null && AnnotationsUtils.equals(incomingCtxSchemaAnnotation, newResolved)){
+            return incomingCtxSchemaAnnotation;
+        }
+        return newResolved;
+    }
+
 
 }
