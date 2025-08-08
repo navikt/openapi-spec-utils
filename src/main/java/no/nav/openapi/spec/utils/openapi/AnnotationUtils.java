@@ -47,7 +47,7 @@ public class AnnotationUtils {
         final var list = new ArrayList<Annotation>(Arrays.asList(original));
         var replaced = false;
         for(var i = 0; i < list.size(); i++) {
-            if(list.get(i).getClass().equals(replacement.getClass())) {
+            if(list.get(i).annotationType().equals(replacement.annotationType())) {
                 list.set(i, replacement);
                 replaced = true;
             }
