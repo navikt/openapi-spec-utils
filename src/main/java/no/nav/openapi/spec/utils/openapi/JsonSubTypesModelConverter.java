@@ -58,20 +58,18 @@ public class JsonSubTypesModelConverter implements ModelConverter {
     @Override
     public Schema<?> resolve(AnnotatedType type, ModelConverterContext context, Iterator<ModelConverter> chain) {
         if(chain.hasNext()) {
-            if(type.isResolveAsRef() ) {
-                if(type.getType() instanceof SimpleType simpleType) {
-                    final Class<?> cls = simpleType.getRawClass();
-                    final var incomingSchemaAnnotation = AnnotationUtils.resolveIncomingSchemaAnnotation(type.getCtxAnnotations(), simpleType);
-                    if(!AnnotationUtils.hasOneOfSchema(incomingSchemaAnnotation)) {
-                        // If class has @JsonSubTypes annotation, create @Schema(oneOf = ...) based on it and add it to type.ctxAnnotations
-                        final var jsonSubtypesAnnotation = cls.getDeclaredAnnotation(JsonSubTypes.class);
-                        if (jsonSubtypesAnnotation != null) {
-                            final Set<Class<?>> subClasses = Arrays.stream(jsonSubtypesAnnotation.value()).map(jst -> jst.value()).collect(Collectors.toUnmodifiableSet());
-                            final var oneOfSchema = subClasses.isEmpty() ? null : AnnotationCreator.createOneOfSchemaAnnotation(subClasses);
-                            final var outgoingSchema = AnnotationUtils.mergeOneOfInto(incomingSchemaAnnotation, oneOfSchema);
-                            final var newCtxAnnotations = AnnotationUtils.replaceSchemaOrArraySchemaAnnotation(type.getCtxAnnotations(), outgoingSchema);
-                            return chain.next().resolve(type.ctxAnnotations(newCtxAnnotations), context, chain);
-                        }
+            if(type.getType() instanceof SimpleType simpleType) {
+                final Class<?> cls = simpleType.getRawClass();
+                final var incomingSchemaAnnotation = AnnotationUtils.resolveIncomingSchemaAnnotation(type.getCtxAnnotations(), simpleType);
+                if(!AnnotationUtils.hasOneOfSchema(incomingSchemaAnnotation)) {
+                    // If class has @JsonSubTypes annotation, create @Schema(oneOf = ...) based on it and add it to type.ctxAnnotations
+                    final var jsonSubtypesAnnotation = cls.getDeclaredAnnotation(JsonSubTypes.class);
+                    if (jsonSubtypesAnnotation != null) {
+                        final Set<Class<?>> subClasses = Arrays.stream(jsonSubtypesAnnotation.value()).map(jst -> jst.value()).collect(Collectors.toUnmodifiableSet());
+                        final var oneOfSchema = subClasses.isEmpty() ? null : AnnotationCreator.createOneOfSchemaAnnotation(subClasses);
+                        final var outgoingSchema = AnnotationUtils.mergeOneOfInto(incomingSchemaAnnotation, oneOfSchema);
+                        final var newCtxAnnotations = AnnotationUtils.replaceSchemaOrArraySchemaAnnotation(type.getCtxAnnotations(), outgoingSchema);
+                        return chain.next().resolve(type.ctxAnnotations(newCtxAnnotations), context, chain);
                     }
                 }
             }
