@@ -31,30 +31,6 @@ public class JsonSubTypesModelConverter implements ModelConverter {
     public JsonSubTypesModelConverter() {
     }
 
-    private Optional<JsonSubTypes> getSubTypesAnnotation(final Annotation[] annotations) {
-        if(annotations != null) {
-            return Arrays.stream(annotations).flatMap(annotation -> {
-                if (annotation instanceof JsonSubTypes jsonSubTypes) {
-                    return Stream.of(jsonSubTypes);
-                } else {
-                    return null;
-                }
-            }).findFirst();
-        }
-        return Optional.empty();
-    }
-
-    private static Stream<Annotation> annotationsWithoutJsonSubTypes(final Annotation[] annotations) {
-        return Arrays.stream(annotations).filter(annotation -> !(annotation instanceof JsonSubTypes));
-    }
-
-    private static Annotation[] firstNonEmptyAnnotations(final Annotation[] a, final Annotation[] b) {
-        if(a != null && a.length > 0) {
-            return a;
-        }
-        return b;
-    }
-
     @Override
     public Schema<?> resolve(AnnotatedType type, ModelConverterContext context, Iterator<ModelConverter> chain) {
         if(chain.hasNext()) {
