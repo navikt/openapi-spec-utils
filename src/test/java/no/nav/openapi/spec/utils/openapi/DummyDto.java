@@ -21,4 +21,6 @@ public class DummyDto {
     public SomeAbstractClass abstractClass = new SomeExtensionClassA();
     // Test of inheritance annotated with JsonSubTypes for all subtypes.
     public OtherAbstractClass otherAbstractClass = new OtherExtensionClassA();
+    // More testing of subtypes, esp discriminator working
+    public ThirdSuperClass thirdSuperClass;
 }

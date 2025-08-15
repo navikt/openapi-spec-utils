@@ -1,5 +1,6 @@
 package no.nav.openapi.spec.utils.openapi;
 
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import io.swagger.v3.oas.integration.OpenApiConfigurationException;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.Paths;
@@ -30,7 +31,10 @@ public class OpenapiGenerateTest {
         final var setupHelper = new OpenApiSetupHelper(new DummyApplication(), new Info(), new Server());
         setupHelper.addResourcePackage("no.nav.openapi.spec.utils"); // Prevents scanner from including classes outside this package
         setupHelper.addResourceClass(DummyRestService.class.getCanonicalName());
-        setupHelper.registerSubTypes(Set.of(SomeExtensionClassB.class, SomeExtensionClassA.class)); // ActualWithSchema.class deliberately not registered here.
+        setupHelper.registerSubTypes(Set.of(
+                SomeExtensionClassB.class, SomeExtensionClassA.class,
+                ThirdExtensionClassA.class, ThirdExtensionClassB.class
+        )); // ActualWithSchema.class deliberately not registered here.
         if(stripTypeNamePrefixes) {
             setupHelper.setTypeNameResolver(new PrefixStrippingFQNTypeNameResolver(STRIP_TYPE_NAME_PREFIX));
         }
@@ -89,6 +93,9 @@ public class OpenapiGenerateTest {
             final List<Schema> oneOf = abstractClass.getOneOf();
             final var refs = oneOf.stream().map(s -> s.get$ref()).toList();
             assertThat(refs).containsExactly(componentRef(makeName.apply(SomeExtensionClassA.class)), componentRef(makeName.apply(SomeExtensionClassB.class)));
+            final var discriminator = abstractClass.getDiscriminator();
+            assertThat(discriminator).isNotNull();
+            assertThat(discriminator.getPropertyName()).isEqualTo("cls");
         }
         {
             final var someExtensionClassA = schemas.get(makeName.apply(SomeExtensionClassA.class));
@@ -100,11 +107,32 @@ public class OpenapiGenerateTest {
             final var otherAbstractClass = schemas.get(makeName.apply(OtherAbstractClass.class));
             final List<Schema> oneOf = otherAbstractClass.getOneOf();
             final var refs = oneOf.stream().map(s -> s.get$ref()).toList();
-            assertThat(refs).containsExactly(componentRef(makeName.apply(OtherExtensionClassA.class)), componentRef(makeName.apply(OtherExtensionClassB.class)));
+            final var otherExtensionaARef = componentRef(makeName.apply(OtherExtensionClassA.class));
+            final var otherExtensionaBRef = componentRef(makeName.apply(OtherExtensionClassB.class));
+            assertThat(refs).containsExactly(otherExtensionaARef, otherExtensionaBRef);
+            final var discriminator = otherAbstractClass.getDiscriminator();
+            assertThat(discriminator.getPropertyName()).isEqualTo("typename");
+            final var mapping = discriminator.getMapping();
+            assertThat(mapping.get("a")).isEqualTo(otherExtensionaARef);
+            assertThat(mapping.get("a2")).isEqualTo(otherExtensionaARef);
+            assertThat(mapping.get("b")).isEqualTo(otherExtensionaBRef);
         }
         {
             final var otherExtensionClassA = schemas.get(makeName.apply(OtherExtensionClassA.class));
             assertThat(otherExtensionClassA.getAllOf()).isNull();
+        }
+        // Check that ThirdSuperClass is resolved correctly
+        {
+            assertThat(properties.get("thirdSuperClass").get$ref()).isEqualTo(componentRef(makeName.apply(ThirdSuperClass.class)));
+            final var thirdSuperClass = schemas.get(makeName.apply(ThirdSuperClass.class));
+            final List<Schema> oneOf = thirdSuperClass.getOneOf();
+            final var oneOfRefs = oneOf.stream().map(s -> s.get$ref()).toList();
+            assertThat(oneOfRefs).containsExactly(componentRef(makeName.apply(ThirdExtensionClassA.class)), componentRef(makeName.apply(ThirdExtensionClassB.class)));
+            final var discriminator = thirdSuperClass.getDiscriminator();
+            assertThat(discriminator.getPropertyName()).isEqualTo(JsonTypeInfo.Id.NAME.getDefaultPropertyName());
+            final var mapping = discriminator.getMapping();
+            assertThat(mapping.get(ThirdExtensionClassA.KODE_A)).isEqualTo(componentRef(makeName.apply(ThirdExtensionClassA.class)));
+            assertThat(mapping.get(ThirdExtensionClassB.KODE_B)).isEqualTo(componentRef(makeName.apply(ThirdExtensionClassB.class)));
         }
     }
 
