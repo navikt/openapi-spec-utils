@@ -4,9 +4,22 @@ import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.annotation.OptBoolean;
 
+import java.util.Objects;
+
 @JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, property = "cls", include = JsonTypeInfo.As.PROPERTY, visible = true, requireTypeIdForSubtypes = OptBoolean.TRUE)
 // Because we register them as subtypes on the OpenApiSetupHelper, we don't need to specify JsonSubTypes here.
 // @JsonSubTypes({@JsonSubTypes.Type(SomeExtensionClassA.class), @JsonSubTypes.Type(SomeExtensionClassB.class)})
 public abstract class SomeAbstractClass {
     public String infoOnSuperClass = "someInfoOnAbstractSuperClass";
+
+    @Override
+    public boolean equals(Object o) {
+        if (!(o instanceof SomeAbstractClass that)) return false;
+        return Objects.equals(infoOnSuperClass, that.infoOnSuperClass);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(infoOnSuperClass);
+    }
 }

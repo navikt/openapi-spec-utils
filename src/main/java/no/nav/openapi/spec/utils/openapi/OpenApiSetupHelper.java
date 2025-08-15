@@ -113,7 +113,9 @@ public class OpenApiSetupHelper {
         // We want all enums to be separated out as ref types:
         ModelResolver.enumsAsRef = true;
         final var context = this.buildContext(baseConfig);
-        final Set<ModelConverter> modelConverters = new LinkedHashSet<>(5);
+        // The DiscriminatorModelCoverter must have a shared instance of this.
+        final var resolvedRefClassLookup = new RefToClassLookup();
+        final Set<ModelConverter> modelConverters = new LinkedHashSet<>(10);
         // Add base ModelResolver with typeNameResolver set on this helper.
         // This must be added first, so that it ends up last in the converter chain
         modelConverters.add(new ModelResolver(this.objectMapper(), this.typeNameResolver));
@@ -121,6 +123,9 @@ public class OpenApiSetupHelper {
         modelConverters.add(new EnumVarnamesConverter());
         // TimeTypesModelConverter converts Duration to OpenAPI string with format "duration".
         modelConverters.add(new TimeTypesModelConverter());
+        // DiscriminatorModelConverter adds discriminator (and mapping) when we've added oneOf with
+        // RegisteredSubtypesModelConverter or JsonSubTypesModelConverter
+        modelConverters.add(new DiscriminatorModelConverter(resolvedRefClassLookup));
         // RegisteredSubtypeModelConverter automatically adds @Schema(oneOf ...) for registeredSubtypes
         modelConverters.add(new RegisteredSubtypesModelConverter(this.registeredSubTypes));
         // JsonSubTypesModelConverter automatically adds @Schema(oneOf ...) for subtypes declared in @JsonSubTypes.
