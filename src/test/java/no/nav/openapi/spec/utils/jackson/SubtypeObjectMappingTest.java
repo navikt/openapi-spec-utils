@@ -17,7 +17,7 @@ public class SubtypeObjectMappingTest {
     public SubtypeObjectMappingTest() {
         final var modifier = OpenapiCompatObjectMapperModifier.withDefaultModifications();
         this.om = modifier.modify(ObjectMapperFactory.createJson());
-        this.om.registerSubtypes(ThirdExtensionClassA.class, ThirdExtensionClassB.class);
+        this.om.registerSubtypes(ThirdExtensionClassA.class, ThirdExtensionClassB.class, ExternalPropertyIncludeA.class);
     }
 
     @Test
@@ -95,6 +95,23 @@ public class SubtypeObjectMappingTest {
                 final SomeAbstractClass deserialized = reader.readValue(serializedFromTs, SomeAbstractClass.class);
                 assertThat(deserialized).isInstanceOf(SomeExtensionClassA.class);
                 assertThat(deserialized).isEqualTo(a);
+            }
+        }
+    }
+
+    @Test
+    public void testDeSerializationExternalPropertyIncludeContainer() throws IOException {
+        final var reader = this.om.reader();
+        {
+            final var a = new ExternalPropertyIncludeContainer(DummyEnum.DUMMY_V1, new ExternalPropertyIncludeA("tst"));
+            {
+                final var serialized = this.om.writeValueAsString(a);
+                final ExternalPropertyIncludeContainer deserialized = reader.readValue(serialized, ExternalPropertyIncludeContainer.class);
+                assertThat(deserialized).isInstanceOf(ExternalPropertyIncludeContainer.class);
+                assertThat(deserialized).isEqualTo(a);
+            }
+            {
+                // TODO final var serializedFromTs =
             }
         }
     }

@@ -33,7 +33,8 @@ public class OpenapiGenerateTest {
         setupHelper.addResourceClass(DummyRestService.class.getCanonicalName());
         setupHelper.registerSubTypes(Set.of(
                 SomeExtensionClassB.class, SomeExtensionClassA.class,
-                ThirdExtensionClassA.class, ThirdExtensionClassB.class
+                ThirdExtensionClassA.class, ThirdExtensionClassB.class,
+                ExternalPropertyIncludeA.class
         )); // ActualWithSchema.class deliberately not registered here.
         if(stripTypeNamePrefixes) {
             setupHelper.setTypeNameResolver(new PrefixStrippingFQNTypeNameResolver(STRIP_TYPE_NAME_PREFIX));
@@ -133,6 +134,22 @@ public class OpenapiGenerateTest {
             final var mapping = discriminator.getMapping();
             assertThat(mapping.get(ThirdExtensionClassA.KODE_A)).isEqualTo(componentRef(makeName.apply(ThirdExtensionClassA.class)));
             assertThat(mapping.get(ThirdExtensionClassB.KODE_B)).isEqualTo(componentRef(makeName.apply(ThirdExtensionClassB.class)));
+        }
+        // Check that ExternalPropertyIncludeContainer is resolved correctly
+        {
+            final var includeContainerName = makeName.apply(ExternalPropertyIncludeContainer.class);
+            final var includeContainerRef = componentRef(includeContainerName);
+            assertThat(properties.get("includeContainer").get$ref()).isEqualTo(includeContainerRef);
+            final var includeContainer = schemas.get(includeContainerName);
+            final Schema included = (Schema) includeContainer.getProperties().get("included");
+            assertThat(included.get$ref()).isEqualTo(componentRef(makeName.apply(ExternalPropertyIncludeInterface.class)));
+            final Schema includedDiscriminator = (Schema) includeContainer.getProperties().get("includedDiscriminator");
+            assertThat(includedDiscriminator.get$ref()).isEqualTo(componentRef(makeName.apply(no.nav.openapi.spec.utils.jackson.dto.DummyEnum.class)));
+            final Schema includedInterface = schemas.get(makeName.apply(ExternalPropertyIncludeInterface.class));
+            final List<Schema> includedOneOfSchemas = includedInterface.getOneOf();
+            final var includedOneOfRefs = includedOneOfSchemas.stream().map(s -> s.get$ref()).toList();
+            assertThat(includedOneOfRefs).containsExactly(componentRef(makeName.apply(ExternalPropertyIncludeA.class)));
+
         }
     }
 
