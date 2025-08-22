@@ -111,7 +111,9 @@ public class SubtypeObjectMappingTest {
                 assertThat(deserialized).isEqualTo(a);
             }
             {
-                // TODO final var serializedFromTs =
+                final var serializedFromTs = "{\"included\":{\"tst\":\"tst\"},\"includedDiscriminator\":\"V1\"}";
+                final ExternalPropertyIncludeContainer deserialized = reader.readValue(serializedFromTs, ExternalPropertyIncludeContainer.class);
+                assertThat(deserialized).isEqualTo(a);
             }
         }
     }
