@@ -6,9 +6,12 @@ import com.fasterxml.jackson.annotation.JsonValue;
  * Copy of enum in openapi package, so that we can get a name collision in test for PrefixStrippingFQNTypeNameResolver.
  */
 public enum DummyEnum {
-    DUMMY_V1("V1"),
-    DUMMY_V2("V2"),
+    DUMMY_V1(DummyEnum.V1),
+    DUMMY_V2(DummyEnum.V2),
     ;
+
+    public static final String V1 = "V1";
+    public static final String V2 = "V2";
 
     @JsonValue
     public final String enumVerdi;

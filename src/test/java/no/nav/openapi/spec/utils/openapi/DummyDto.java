@@ -23,4 +23,6 @@ public class DummyDto {
     public OtherAbstractClass otherAbstractClass = new OtherExtensionClassA();
     // More testing of subtypes, esp discriminator working
     public ThirdSuperClass thirdSuperClass;
+    // Test JsonTypeInfo.As.EXTERNAL_PROPERTY discriminator.
+    public ExternalPropertyIncludeContainer includeContainer;
 }
