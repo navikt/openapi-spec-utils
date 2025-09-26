@@ -41,6 +41,10 @@ public class OpenApiResource {
         this.yamlOutputMapper = withDeterministicOutput(Objects.requireNonNull(yamlOutputMapper));
     }
 
+    /**
+     * Add sorting to get a deterministic output of the generated openapi specification.
+     * Without this, the output would randomly change, causing unwanted git diffs in the output.
+     */
     protected ObjectMapper withDeterministicOutput(final ObjectMapper om) {
         return om.copy()
                 .configure(SerializationFeature.ORDER_MAP_ENTRIES_BY_KEYS, true)
