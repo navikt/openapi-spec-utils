@@ -53,9 +53,8 @@ public class OpenapiCompatObjectMapperModifierTest {
     public void testSerDeserRoundtrip(final Object testDto) throws JsonProcessingException {
         final var modifier = OpenapiCompatObjectMapperModifier.withDefaultModifications();
         final var objectMapper = modifier.modify(ObjectMapperFactory.createJson());
-            final var input = testDto;
-            final String json = objectMapper.writeValueAsString(input);
-            final var result = objectMapper.readerFor(input.getClass()).readValue(json);
-            assertThat(result).isEqualTo(input);
+        final String json = objectMapper.writeValueAsString(testDto);
+        final var result = objectMapper.readerFor(testDto.getClass()).readValue(json);
+        assertThat(result).isEqualTo(testDto);
     }
 }
