@@ -12,7 +12,10 @@ import java.util.ArrayList;
 /**
  * Deaktiverer annotasjoner utanom @JsonValue og @JsonEnumDefaultValue, slik at enums annotert med @JsonFormat(shape = Shape.OBJECT)
  * likevel ikkje blir serialisert som objekt. Dette for at serialisert resultat kan stemme med openapi spesifikasjon.
+ *
+ * @deprecated Bruker nå FilteringEnumAnnotationIntrospector.defaultOpenapiCompat() istedenfor.
  */
+@Deprecated
 public class OpenapiCompatAnnotationIntrospector extends JacksonAnnotationIntrospector {
     public static final ArrayList<Class<? extends Annotation>> whitelistedAnnotations;
 
