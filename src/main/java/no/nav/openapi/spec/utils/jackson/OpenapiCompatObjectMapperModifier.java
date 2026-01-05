@@ -32,10 +32,10 @@ public class OpenapiCompatObjectMapperModifier {
 
     public static OpenapiCompatObjectMapperModifier withDefaultModifications() {
         return new OpenapiCompatObjectMapperModifier(
-            new OpenapiCompatAnnotationIntrospector(), // <- Deaktiverer alle annotasjoner utenom @JsonValue
-            new OpenapiCompatEnumBeanDeserializerModifier(), // <- EnumDeserializer skal først sjå etter @JsonValue, deretter toString()
-            Set.of(SerializationFeature.WRITE_ENUMS_USING_TO_STRING), // <- Bruk toString() viss @JsonValue ikkje er spesifisert
-            JsonInclude.Include.NON_ABSENT // <- Ikkje serializer null properties (eller empty Optional), blir då undefined som stemmer med generert kode.
+                FilteringEnumAnnotationIntrospector.defaultOpenapiCompat(), // <- Deaktiverer JsonFormat annotasjon
+                new OpenapiCompatEnumBeanDeserializerModifier(), // <- EnumDeserializer skal først sjå etter @JsonValue, deretter toString()
+                Set.of(SerializationFeature.WRITE_ENUMS_USING_TO_STRING), // <- Bruk toString() viss @JsonValue ikkje er spesifisert
+                JsonInclude.Include.NON_ABSENT // <- Ikkje serializer null properties (eller empty Optional), blir då undefined som stemmer med generert kode.
         );
     }
 
