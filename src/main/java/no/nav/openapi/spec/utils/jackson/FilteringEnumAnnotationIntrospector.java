@@ -34,9 +34,9 @@ public class FilteringEnumAnnotationIntrospector extends JacksonAnnotationIntros
     @Override
     protected <A extends Annotation> A _findAnnotation(Annotated ann, Class<A> annoClass) {
         final JavaType typ = ann.getType();
-        // Når annotasjon er på ein enum
+        // When annotation is on an enum (or property declaration of enum)
         if(typ != null && (typ.isEnumType() || typ.isTypeOrSubTypeOf(Enum.class))) {
-            // Deaktiver alle annotasjoner whitelisted. Dei er dei einaste openapi generator bryr seg om.
+            // Deactivate all blacklisted annotations.
             if(blacklistedAnnotations.contains(annoClass)) {
                 return null;
             }
