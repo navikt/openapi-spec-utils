@@ -105,6 +105,7 @@
         </dependency>
     </dependencies>
 
+    <!-- Temporarily disabled to workaround github workflow issue:
     <build>
         <plugins>
             <plugin>
@@ -121,4 +122,5 @@
             </plugin>
         </plugins>
     </build>
+    -->
 </project>
