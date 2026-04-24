@@ -20,3 +20,9 @@ jobs:
           cache: 'maven'
       - name: Build and test
         run: mvn verify -e
+
+  sif-code-scan:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: navikt/sif-gha-workflows/.github/actions/sif-code-scan@main
