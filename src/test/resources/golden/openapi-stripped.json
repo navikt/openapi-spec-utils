@@ -1,0 +1,490 @@
+{
+  "components" : {
+    "schemas" : {
+      "jackson.dto.AbstractWithSchema" : {
+        "description" : "this abstract class has a schema annotation",
+        "properties" : {
+          "superWithSchema" : {
+            "type" : "string"
+          }
+        },
+        "type" : "object"
+      },
+      "jackson.dto.ContainerA" : {
+        "properties" : {
+          "listOfValueAnnotatedEnums" : {
+            "items" : {
+              "$ref" : "#/components/schemas/jackson.dto.ValueAnnotatedEnum"
+            },
+            "type" : "array"
+          },
+          "notEnumCodeValue" : {
+            "$ref" : "#/components/schemas/jackson.dto.NotEnumCodeValue"
+          },
+          "objectAnnotatedEnum" : {
+            "$ref" : "#/components/schemas/jackson.dto.ObjectAnnotatedEnum"
+          },
+          "otherData" : {
+            "$ref" : "#/components/schemas/jackson.dto.OtherData"
+          },
+          "unAnnotatedEnum" : {
+            "$ref" : "#/components/schemas/jackson.dto.UnAnnotatedEnum"
+          },
+          "valueAnnotatedEnum" : {
+            "$ref" : "#/components/schemas/jackson.dto.ValueAnnotatedEnum"
+          }
+        },
+        "type" : "object"
+      },
+      "jackson.dto.ContainerB" : {
+        "properties" : {
+          "enum1" : {
+            "$ref" : "#/components/schemas/jackson.dto.ValueAnnotatedEnum"
+          },
+          "txt1" : {
+            "type" : "string"
+          }
+        },
+        "type" : "object"
+      },
+      "jackson.dto.ContainerC" : {
+        "properties" : {
+          "date" : {
+            "format" : "date",
+            "type" : "string"
+          },
+          "dateTime" : {
+            "format" : "date-time",
+            "type" : "string"
+          },
+          "duration" : {
+            "format" : "duration",
+            "type" : "string"
+          },
+          "enumKeyedMap" : {
+            "additionalProperties" : {
+              "type" : "string"
+            },
+            "type" : "object"
+          },
+          "flag" : {
+            "type" : "boolean"
+          },
+          "nullableNumber" : {
+            "format" : "int32",
+            "type" : "integer"
+          },
+          "optionalText" : {
+            "type" : "string"
+          },
+          "others" : {
+            "items" : {
+              "$ref" : "#/components/schemas/jackson.dto.OtherAbstractClass"
+            },
+            "type" : "array"
+          },
+          "thirdSuperClass" : {
+            "$ref" : "#/components/schemas/jackson.dto.ThirdSuperClass"
+          },
+          "toStringObjectEnum" : {
+            "$ref" : "#/components/schemas/jackson.dto.ToStringObjectEnum"
+          },
+          "toStringObjectEnums" : {
+            "items" : {
+              "$ref" : "#/components/schemas/jackson.dto.ToStringObjectEnum"
+            },
+            "type" : "array"
+          },
+          "yearMonth" : {
+            "format" : "year-month",
+            "type" : "string"
+          }
+        },
+        "type" : "object"
+      },
+      "jackson.dto.DummyEnum" : {
+        "enum" : [ "V1", "V2" ],
+        "type" : "string",
+        "x-enum-varnames" : [ "DUMMY_V1", "DUMMY_V2" ]
+      },
+      "jackson.dto.ExternalPropertyIncludeA" : {
+        "properties" : {
+          "tst" : {
+            "type" : "string"
+          }
+        },
+        "type" : "object"
+      },
+      "jackson.dto.ExternalPropertyIncludeContainer" : {
+        "properties" : {
+          "included" : {
+            "$ref" : "#/components/schemas/jackson.dto.ExternalPropertyIncludeInterface"
+          },
+          "includedDiscriminator" : {
+            "$ref" : "#/components/schemas/jackson.dto.DummyEnum"
+          }
+        },
+        "type" : "object"
+      },
+      "jackson.dto.ExternalPropertyIncludeInterface" : {
+        "oneOf" : [ {
+          "$ref" : "#/components/schemas/jackson.dto.ExternalPropertyIncludeA"
+        } ],
+        "type" : "object"
+      },
+      "jackson.dto.NotEnumCodeValue" : {
+        "properties" : {
+          "codeValue" : {
+            "type" : "string"
+          },
+          "txt" : {
+            "type" : "string"
+          }
+        },
+        "type" : "object"
+      },
+      "jackson.dto.ObjectAnnotatedEnum" : {
+        "enum" : [ "VALUE_A", "VALUE_B" ],
+        "type" : "string",
+        "x-enum-varnames" : [ "VALUE_A", "VALUE_B" ]
+      },
+      "jackson.dto.OtherAbstractClass" : {
+        "discriminator" : {
+          "mapping" : {
+            "a" : "#/components/schemas/jackson.dto.OtherExtensionClassA",
+            "a2" : "#/components/schemas/jackson.dto.OtherExtensionClassA",
+            "b" : "#/components/schemas/jackson.dto.OtherExtensionClassB"
+          },
+          "propertyName" : "typename"
+        },
+        "oneOf" : [ {
+          "$ref" : "#/components/schemas/jackson.dto.OtherExtensionClassA"
+        }, {
+          "$ref" : "#/components/schemas/jackson.dto.OtherExtensionClassB"
+        } ],
+        "properties" : {
+          "infoOnSuperClass" : {
+            "type" : "string"
+          },
+          "typename" : {
+            "type" : "string"
+          }
+        },
+        "required" : [ "typename" ],
+        "type" : "object"
+      },
+      "jackson.dto.OtherData" : {
+        "description" : "description of other data, tests stackoveflow issue that was does not reappear",
+        "properties" : {
+          "num1" : {
+            "format" : "int32",
+            "type" : "integer"
+          },
+          "num2" : {
+            "format" : "int32",
+            "type" : "integer"
+          },
+          "txt1" : {
+            "type" : "string"
+          }
+        },
+        "type" : "object"
+      },
+      "jackson.dto.OtherExtensionClassA" : {
+        "properties" : {
+          "infoOnSuperClass" : {
+            "type" : "string"
+          },
+          "otherExtensionA" : {
+            "type" : "string"
+          }
+        },
+        "type" : "object"
+      },
+      "jackson.dto.OtherExtensionClassB" : {
+        "properties" : {
+          "infoOnSuperClass" : {
+            "type" : "string"
+          },
+          "otherExtensionB" : {
+            "type" : "string"
+          }
+        },
+        "type" : "object"
+      },
+      "jackson.dto.SomeAbstractClass" : {
+        "discriminator" : {
+          "mapping" : {
+            "no.nav.openapi.spec.utils.jackson.dto.SomeExtensionClassA" : "#/components/schemas/jackson.dto.SomeExtensionClassA",
+            "no.nav.openapi.spec.utils.jackson.dto.SomeExtensionClassB" : "#/components/schemas/jackson.dto.SomeExtensionClassB"
+          },
+          "propertyName" : "cls"
+        },
+        "oneOf" : [ {
+          "$ref" : "#/components/schemas/jackson.dto.SomeExtensionClassA"
+        }, {
+          "$ref" : "#/components/schemas/jackson.dto.SomeExtensionClassB"
+        } ],
+        "properties" : {
+          "cls" : {
+            "type" : "string"
+          },
+          "infoOnSuperClass" : {
+            "type" : "string"
+          }
+        },
+        "required" : [ "cls" ],
+        "type" : "object"
+      },
+      "jackson.dto.SomeExtensionClassA" : {
+        "properties" : {
+          "extensionA" : {
+            "type" : "string"
+          },
+          "infoOnSuperClass" : {
+            "type" : "string"
+          }
+        },
+        "type" : "object"
+      },
+      "jackson.dto.SomeExtensionClassB" : {
+        "properties" : {
+          "extensionB" : {
+            "type" : "string"
+          },
+          "infoOnSuperClass" : {
+            "type" : "string"
+          }
+        },
+        "type" : "object"
+      },
+      "jackson.dto.ThirdExtensionClassA" : {
+        "properties" : {
+          "propertyA" : {
+            "type" : "string"
+          },
+          "superInfo" : {
+            "type" : "string"
+          }
+        },
+        "type" : "object"
+      },
+      "jackson.dto.ThirdExtensionClassB" : {
+        "properties" : {
+          "propertyB" : {
+            "type" : "string"
+          },
+          "superInfo" : {
+            "type" : "string"
+          }
+        },
+        "type" : "object"
+      },
+      "jackson.dto.ThirdSuperClass" : {
+        "discriminator" : {
+          "mapping" : {
+            "KODE_A" : "#/components/schemas/jackson.dto.ThirdExtensionClassA",
+            "KODE_B" : "#/components/schemas/jackson.dto.ThirdExtensionClassB"
+          },
+          "propertyName" : "@type"
+        },
+        "oneOf" : [ {
+          "$ref" : "#/components/schemas/jackson.dto.ThirdExtensionClassA"
+        }, {
+          "$ref" : "#/components/schemas/jackson.dto.ThirdExtensionClassB"
+        } ],
+        "properties" : {
+          "superInfo" : {
+            "type" : "string"
+          }
+        },
+        "type" : "object"
+      },
+      "jackson.dto.ToStringObjectEnum" : {
+        "enum" : [ "KODE-A", "KODE-B" ],
+        "type" : "string",
+        "x-enum-varnames" : [ "VALUE_A", "VALUE_B" ]
+      },
+      "jackson.dto.UnAnnotatedEnum" : {
+        "enum" : [ "VALUE_A", "VALUE_B" ],
+        "type" : "string",
+        "x-enum-varnames" : [ "VALUE_A", "VALUE_B" ]
+      },
+      "jackson.dto.ValueAnnotatedEnum" : {
+        "enum" : [ "A", "B" ],
+        "type" : "string",
+        "x-enum-varnames" : [ "VALUE_A", "VALUE_B" ]
+      },
+      "openapi.DummyDto" : {
+        "properties" : {
+          "abstractClass" : {
+            "$ref" : "#/components/schemas/jackson.dto.SomeAbstractClass"
+          },
+          "durationProperty" : {
+            "format" : "duration",
+            "type" : "string"
+          },
+          "enumProperty" : {
+            "$ref" : "#/components/schemas/openapi.DummyEnum"
+          },
+          "includeContainer" : {
+            "$ref" : "#/components/schemas/jackson.dto.ExternalPropertyIncludeContainer"
+          },
+          "nummerProperty" : {
+            "format" : "int32",
+            "type" : "integer"
+          },
+          "otherAbstractClass" : {
+            "$ref" : "#/components/schemas/jackson.dto.OtherAbstractClass"
+          },
+          "tekstProperty" : {
+            "type" : "string"
+          },
+          "thirdSuperClass" : {
+            "$ref" : "#/components/schemas/jackson.dto.ThirdSuperClass"
+          },
+          "yearMonthProperty" : {
+            "format" : "year-month",
+            "type" : "string"
+          }
+        },
+        "type" : "object"
+      },
+      "openapi.DummyEnum" : {
+        "enum" : [ "V1", "V2" ],
+        "type" : "string",
+        "x-enum-varnames" : [ "DUMMY_V1", "DUMMY_V2" ]
+      }
+    }
+  },
+  "info" : {
+    "title" : "golden",
+    "version" : "1"
+  },
+  "openapi" : "3.0.1",
+  "paths" : {
+    "/api/testing/abstract" : {
+      "post" : {
+        "description" : "reproduction of resolve loop issue",
+        "operationId" : "other",
+        "responses" : {
+          "default" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/jackson.dto.AbstractWithSchema"
+                }
+              }
+            },
+            "description" : "default response"
+          }
+        }
+      }
+    },
+    "/api/testing/containerA" : {
+      "post" : {
+        "description" : "takes ContainerA, returns ContainerB",
+        "operationId" : "containerA",
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/jackson.dto.ContainerA"
+              }
+            }
+          }
+        },
+        "responses" : {
+          "default" : {
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/jackson.dto.ContainerB"
+                }
+              }
+            },
+            "description" : "default response"
+          }
+        }
+      }
+    },
+    "/api/testing/containerC/{id}" : {
+      "get" : {
+        "description" : "returns ContainerC",
+        "operationId" : "containerC",
+        "parameters" : [ {
+          "in" : "path",
+          "name" : "id",
+          "required" : true,
+          "schema" : {
+            "format" : "int64",
+            "type" : "integer"
+          }
+        }, {
+          "in" : "query",
+          "name" : "type",
+          "schema" : {
+            "$ref" : "#/components/schemas/jackson.dto.ToStringObjectEnum"
+          }
+        } ],
+        "responses" : {
+          "default" : {
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "allOf" : [ {
+                    "$ref" : "#/components/schemas/jackson.dto.ContainerC"
+                  } ],
+                  "nullable" : true
+                }
+              }
+            },
+            "description" : "default response"
+          }
+        }
+      }
+    },
+    "/api/testing/dummy" : {
+      "get" : {
+        "description" : "returns dummy dto",
+        "operationId" : "dummy",
+        "responses" : {
+          "default" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/openapi.DummyDto"
+                }
+              }
+            },
+            "description" : "default response"
+          }
+        }
+      }
+    },
+    "/api/testing/optional" : {
+      "get" : {
+        "description" : "returns optional dummy dto",
+        "operationId" : "optionalDummy",
+        "responses" : {
+          "default" : {
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "allOf" : [ {
+                    "$ref" : "#/components/schemas/openapi.DummyDto"
+                  } ],
+                  "nullable" : true
+                }
+              }
+            },
+            "description" : "default response"
+          }
+        }
+      }
+    }
+  },
+  "servers" : [ {
+    "url" : "/golden"
+  } ]
+}

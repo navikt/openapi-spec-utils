@@ -1,0 +1,83 @@
+ValueAnnotatedEnum <- "A" => ValueAnnotatedEnum/VALUE_A: VALUE_A
+ValueAnnotatedEnum <- "B" => ValueAnnotatedEnum/VALUE_B: VALUE_B
+ValueAnnotatedEnum <- "VALUE_A" => ERROR
+ValueAnnotatedEnum <- "VALUE_B" => ERROR
+ValueAnnotatedEnum <- "KODE-A" => ERROR
+ValueAnnotatedEnum <- "V1" => ERROR
+ValueAnnotatedEnum <- "DUMMY_V2" => ERROR
+ValueAnnotatedEnum <- "unknown" => ERROR
+ValueAnnotatedEnum <- "" => ERROR
+ValueAnnotatedEnum <- null => null
+ValueAnnotatedEnum <- 1 => ValueAnnotatedEnum/VALUE_B: VALUE_B
+ValueAnnotatedEnum <- {"codeValue":"B"} => ValueAnnotatedEnum/VALUE_B: VALUE_B
+ValueAnnotatedEnum <- {"codeValue":"KODE-B","navn":"x"} => ERROR
+ValueAnnotatedEnum <- {"kode":"A"} => ERROR
+UnAnnotatedEnum <- "A" => ERROR
+UnAnnotatedEnum <- "B" => ERROR
+UnAnnotatedEnum <- "VALUE_A" => UnAnnotatedEnum/VALUE_A: VALUE_A
+UnAnnotatedEnum <- "VALUE_B" => UnAnnotatedEnum/VALUE_B: VALUE_B
+UnAnnotatedEnum <- "KODE-A" => ERROR
+UnAnnotatedEnum <- "V1" => ERROR
+UnAnnotatedEnum <- "DUMMY_V2" => ERROR
+UnAnnotatedEnum <- "unknown" => ERROR
+UnAnnotatedEnum <- "" => ERROR
+UnAnnotatedEnum <- null => null
+UnAnnotatedEnum <- 1 => UnAnnotatedEnum/VALUE_B: VALUE_B
+UnAnnotatedEnum <- {"codeValue":"B"} => ERROR
+UnAnnotatedEnum <- {"codeValue":"KODE-B","navn":"x"} => ERROR
+UnAnnotatedEnum <- {"kode":"A"} => ERROR
+ObjectAnnotatedEnum <- "A" => ERROR
+ObjectAnnotatedEnum <- "B" => ERROR
+ObjectAnnotatedEnum <- "VALUE_A" => ObjectAnnotatedEnum/VALUE_A: VALUE_A
+ObjectAnnotatedEnum <- "VALUE_B" => ObjectAnnotatedEnum/VALUE_B: VALUE_B
+ObjectAnnotatedEnum <- "KODE-A" => ERROR
+ObjectAnnotatedEnum <- "V1" => ERROR
+ObjectAnnotatedEnum <- "DUMMY_V2" => ERROR
+ObjectAnnotatedEnum <- "unknown" => ERROR
+ObjectAnnotatedEnum <- "" => ERROR
+ObjectAnnotatedEnum <- null => null
+ObjectAnnotatedEnum <- 1 => ObjectAnnotatedEnum/VALUE_B: VALUE_B
+ObjectAnnotatedEnum <- {"codeValue":"B"} => ERROR
+ObjectAnnotatedEnum <- {"codeValue":"KODE-B","navn":"x"} => ERROR
+ObjectAnnotatedEnum <- {"kode":"A"} => ERROR
+ToStringObjectEnum <- "A" => ERROR
+ToStringObjectEnum <- "B" => ERROR
+ToStringObjectEnum <- "VALUE_A" => ERROR
+ToStringObjectEnum <- "VALUE_B" => ERROR
+ToStringObjectEnum <- "KODE-A" => ToStringObjectEnum/VALUE_A: KODE-A
+ToStringObjectEnum <- "V1" => ERROR
+ToStringObjectEnum <- "DUMMY_V2" => ERROR
+ToStringObjectEnum <- "unknown" => ERROR
+ToStringObjectEnum <- "" => ERROR
+ToStringObjectEnum <- null => null
+ToStringObjectEnum <- 1 => ToStringObjectEnum/VALUE_B: KODE-B
+ToStringObjectEnum <- {"codeValue":"B"} => ERROR
+ToStringObjectEnum <- {"codeValue":"KODE-B","navn":"x"} => ToStringObjectEnum/VALUE_B: KODE-B
+ToStringObjectEnum <- {"kode":"A"} => ERROR
+DummyEnum <- "A" => ERROR
+DummyEnum <- "B" => ERROR
+DummyEnum <- "VALUE_A" => ERROR
+DummyEnum <- "VALUE_B" => ERROR
+DummyEnum <- "KODE-A" => ERROR
+DummyEnum <- "V1" => DummyEnum/DUMMY_V1: DUMMY_V1
+DummyEnum <- "DUMMY_V2" => ERROR
+DummyEnum <- "unknown" => ERROR
+DummyEnum <- "" => ERROR
+DummyEnum <- null => null
+DummyEnum <- 1 => DummyEnum/DUMMY_V2: DUMMY_V2
+DummyEnum <- {"codeValue":"B"} => ERROR
+DummyEnum <- {"codeValue":"KODE-B","navn":"x"} => ERROR
+DummyEnum <- {"kode":"A"} => ERROR
+ContainerA <- strings => ERROR
+ContainerA <- objects => ERROR
+ContainerA <- unknown property => ERROR
+ContainerB <- unknown property => ContainerB: ContainerB{enum1=VALUE_A, txt1='t'}
+OtherData <- missing primitive => OtherData: OtherData[txt1=t, num1=0, num2=null]
+OtherData <- null primitive => OtherData: OtherData[txt1=t, num1=0, num2=null]
+OtherData <- trailing tokens => OtherData: OtherData[txt1=t, num1=2, num2=null]
+ContainerC <- strings => ContainerC: ContainerC[toStringObjectEnum=KODE-A, toStringObjectEnums=[KODE-B], enumKeyedMap={VALUE_A=a}, date=2024-02-29, dateTime=2024-02-29T12:13:14, duration=PT1H, yearMonth=2024-02, optionalText=Optional[t], nullableNumber=null, flag=true, thirdSuperClass=null, others=null] thirdSuperClass=null others=null
+ContainerC <- objects => ContainerC: ContainerC[toStringObjectEnum=KODE-A, toStringObjectEnums=[KODE-B], enumKeyedMap=null, date=null, dateTime=null, duration=null, yearMonth=null, optionalText=Optional.empty, nullableNumber=null, flag=false, thirdSuperClass=null, others=null] thirdSuperClass=ThirdExtensionClassB: superInfo=superInfo, x others=[OtherExtensionClassB: infoOnSuperClass=someInfoOnOtherAbstractClass, otherExtensionB]
+ThirdSuperClass <- KODE_A => ThirdExtensionClassA: superInfo=superInfo, AAA
+OtherAbstractClass <- a2 => OtherExtensionClassA: infoOnSuperClass=someInfoOnOtherAbstractClass, x
+SomeAbstractClass <- cls => ERROR
+ExternalPropertyIncludeContainer <- V1 => ExternalPropertyIncludeContainer: ExternalPropertyIncludeContainer[includedDiscriminator=DUMMY_V1, included=ExternalPropertyIncludeA[tst=tst]]
