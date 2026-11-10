@@ -1,6 +1,7 @@
 package no.nav.openapi.spec.utils.jackson;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.MapperFeature;
 import io.swagger.v3.core.util.ObjectMapperFactory;
 import no.nav.openapi.spec.utils.jackson.dto.*;
 import org.junit.jupiter.api.Test;
@@ -14,9 +15,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class OpenapiCompatObjectMapperModifierTest {
 
     @Test
-    public void testThatNullSerializesToNotIncluded() throws JsonProcessingException {
+    public void testThatNullSerializesToNotIncluded() throws JacksonException {
         final var modifier = OpenapiCompatObjectMapperModifier.withDefaultModifications();
-        final var objectMapper = modifier.modify(ObjectMapperFactory.createJson());
+        final var objectMapper = modifier.modify(ObjectMapperFactory.createJson().rebuild().disable(MapperFeature.DETECT_PARAMETER_NAMES).build());
         final var inp = new OtherData("txt1", 1, null);
         final var jsonStr = objectMapper.writeValueAsString(inp);
         // Sjekk at null property ikkje er med i serialisert json
@@ -50,9 +51,9 @@ public class OpenapiCompatObjectMapperModifierTest {
 
     @ParameterizedTest
     @MethodSource("testDtos")
-    public void testSerDeserRoundtrip(final Object testDto) throws JsonProcessingException {
+    public void testSerDeserRoundtrip(final Object testDto) throws JacksonException {
         final var modifier = OpenapiCompatObjectMapperModifier.withDefaultModifications();
-        final var objectMapper = modifier.modify(ObjectMapperFactory.createJson());
+        final var objectMapper = modifier.modify(ObjectMapperFactory.createJson().rebuild().disable(MapperFeature.DETECT_PARAMETER_NAMES).build());
         final String json = objectMapper.writeValueAsString(testDto);
         final var result = objectMapper.readerFor(testDto.getClass()).readValue(json);
         assertThat(result).isEqualTo(testDto);

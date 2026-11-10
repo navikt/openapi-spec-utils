@@ -1,11 +1,10 @@
 package no.nav.openapi.spec.utils.jackson;
 
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.DeserializationContext;
-import com.fasterxml.jackson.databind.JsonDeserializer;
+import tools.jackson.core.JacksonException;
+import tools.jackson.core.JsonParser;
+import tools.jackson.databind.DeserializationContext;
+import tools.jackson.databind.ValueDeserializer;
 
-import java.io.IOException;
 import java.util.Objects;
 
 /**
@@ -17,27 +16,23 @@ import java.util.Objects;
  * <p>
  * preProcessor can change the incoming json to a form/value that the current deserializer can handle.
  */
-public class JsonParserPreProcessingDeserializer<T> extends JsonDeserializer<T> {
-    private final JsonDeserializer<T> wrappedDeserializer;
+public class JsonParserPreProcessingDeserializer<T> extends ValueDeserializer<T> {
+    private final ValueDeserializer<T> wrappedDeserializer;
     private final JsonParserPreProcessor preProcessor;
 
     public JsonParserPreProcessingDeserializer(
-            final JsonDeserializer<T> wrappedDeserializer,
+            final ValueDeserializer<T> wrappedDeserializer,
             final JsonParserPreProcessor preProcessor) {
         this.wrappedDeserializer = Objects.requireNonNull(wrappedDeserializer);
         this.preProcessor = Objects.requireNonNull(preProcessor);
     }
 
     @Override
-    public T deserialize(JsonParser p, DeserializationContext ctxt) throws IOException, JsonProcessingException {
+    public T deserialize(JsonParser p, DeserializationContext ctxt) throws JacksonException {
         // Pre-process the JSON input
-        final JsonParser preProcessedParser = this.preProcessJsonParser(p);
+        final JsonParser preProcessedParser = this.preProcessor.preProcess(p);
 
         // Delegate to the default deserializer
         return wrappedDeserializer.deserialize(preProcessedParser, ctxt);
-    }
-
-    private JsonParser preProcessJsonParser(final JsonParser originalParser) throws IOException {
-        return this.preProcessor.preProcess(originalParser);
     }
 }

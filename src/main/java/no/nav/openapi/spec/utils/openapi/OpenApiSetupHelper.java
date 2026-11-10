@@ -1,12 +1,13 @@
 package no.nav.openapi.spec.utils.openapi;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.MapperFeature;
+import tools.jackson.databind.ObjectMapper;
 import io.swagger.v3.core.converter.ModelConverter;
 import io.swagger.v3.core.converter.ModelConverters;
 import io.swagger.v3.core.jackson.ModelResolver;
 import io.swagger.v3.core.jackson.TypeNameResolver;
 import io.swagger.v3.core.util.ObjectMapperFactory;
-import io.swagger.v3.jaxrs2.integration.JaxrsOpenApiContextBuilder;
+import io.swagger.v3.rest.integration.RestOpenApiContextBuilder;
 import io.swagger.v3.oas.integration.OpenApiConfigurationException;
 import io.swagger.v3.oas.integration.SwaggerConfiguration;
 import io.swagger.v3.oas.integration.api.OpenAPIConfiguration;
@@ -22,7 +23,7 @@ public class OpenApiSetupHelper {
     private final Application application;
     private final Info info;
     private final Server server;
-    private String scannerClass = "io.swagger.v3.jaxrs2.integration.JaxrsAnnotationScanner";
+    private String scannerClass = "io.swagger.v3.rest.integration.RestAnnotationScanner";
     private final Set<String> resourcePackages = new HashSet<String>();
     private final Set<String> resourceClasses = new HashSet<String>();
     private final Set<Class<?>> registeredSubTypes = new LinkedHashSet<>();
@@ -76,11 +77,18 @@ public class OpenApiSetupHelper {
     }
 
     protected ObjectMapper objectMapper() {
-        final var om = ObjectMapperFactory.createJson();
         // Remove all JsonSubTypes annotations from the objectmapper used in openapi creation. To avoid problem with
         // allOf element being created on subtypes along with oneOf from JsonSubTypesModelConverter
-        om.setAnnotationIntrospector(new NoJsonSubTypesAnnotationIntrospector());
-        return om;
+        return ObjectMapperFactory.createJson().rebuild()
+                .annotationIntrospector(new NoJsonSubTypesAnnotationIntrospector())
+                // Use the same bean introspection as Jackson 2 did, so that generated spec stays the same as with
+                // version 2 of this library, and matches servers using JsonMapper.builderWithJackson2Defaults().
+                // (Jackson 3 would otherwise f.ex. detect constructor parameter names as properties).
+                .disable(MapperFeature.DETECT_PARAMETER_NAMES)
+                .disable(MapperFeature.FIX_FIELD_NAME_UPPER_CASE_PREFIX)
+                .enable(MapperFeature.ALLOW_FINAL_FIELDS_AS_MUTATORS)
+                .enable(MapperFeature.USE_GETTERS_AS_SETTERS)
+                .build();
     }
 
     protected OpenAPIConfiguration initBaseConfig()  {
@@ -100,7 +108,7 @@ public class OpenApiSetupHelper {
     }
 
     protected OpenApiContext buildContext(final OpenAPIConfiguration baseConfig) throws OpenApiConfigurationException {
-        return new JaxrsOpenApiContextBuilder<>()
+        return new RestOpenApiContextBuilder<>()
                 .ctxId(makeRandomId()) // Use new random ctxId each time to avoid caching
                 .application(this.application)
                 .openApiConfiguration(baseConfig)

@@ -1,13 +1,13 @@
 package no.nav.openapi.spec.utils.jackson;
 
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.databind.BeanDescription;
-import com.fasterxml.jackson.databind.DeserializationConfig;
-import com.fasterxml.jackson.databind.JavaType;
-import com.fasterxml.jackson.databind.JsonDeserializer;
-import com.fasterxml.jackson.databind.deser.BeanDeserializerModifier;
+import tools.jackson.core.JsonParser;
+import tools.jackson.databind.BeanDescription;
+import tools.jackson.databind.DeserializationConfig;
+import tools.jackson.databind.JavaType;
+import tools.jackson.databind.ValueDeserializer;
+import tools.jackson.databind.deser.ValueDeserializerModifier;
 
-import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -19,12 +19,12 @@ import java.util.Optional;
  * Can be used to support deserializing various formats for a (super)type without having to add support for it to the
  * actual type class.
  */
-public class JsonParserPreProcessingDeserializerModifier extends BeanDeserializerModifier {
+public class JsonParserPreProcessingDeserializerModifier extends ValueDeserializerModifier {
     private final List<PreProcessorMatcher> processorMatchers;
 
     public JsonParserPreProcessingDeserializerModifier(final List<PreProcessorMatcher> processorMatchers) {
-        this.processorMatchers = Objects.requireNonNull(processorMatchers);
-        processorMatchers.forEach(Objects::requireNonNull);
+        Objects.requireNonNull(processorMatchers).forEach(Objects::requireNonNull);
+        this.processorMatchers = new ArrayList<>(processorMatchers);
     }
 
     public JsonParserPreProcessingDeserializerModifier() {
@@ -44,12 +44,12 @@ public class JsonParserPreProcessingDeserializerModifier extends BeanDeserialize
         Objects.requireNonNull(processor);
         final var m = new PreProcessorMatcher() {
             @Override
-            public boolean isMatch(BeanDescription beanDesc) {
-                return matcher.isMatch(beanDesc);
+            public boolean isMatch(BeanDescription.Supplier beanDescRef) {
+                return matcher.isMatch(beanDescRef);
             }
 
             @Override
-            public JsonParser preProcess(JsonParser p) throws IOException {
+            public JsonParser preProcess(JsonParser p) {
                 return processor.preProcess(p);
             }
 
@@ -58,43 +58,43 @@ public class JsonParserPreProcessingDeserializerModifier extends BeanDeserialize
     }
 
     /**
-     * If a PreProcessorMatcher matches beanDesc, return the attached JsonParserPreProcessor.
+     * If a PreProcessorMatcher matches beanDescRef, return the attached JsonParserPreProcessor.
      * Only the first match found is returned and used. It is the callers responsibility to not add multiple matching
      * preprocessors, or add them in order so that the correct one is returned here for a given BeanDescription.
      *
      * @return Found JsonParserPreProcessor to modify deserializer with, or None if no match is found.
      */
-    private Optional<PreProcessorMatcher> resolvePreProcessor(final BeanDescription beanDesc) {
+    private Optional<PreProcessorMatcher> resolvePreProcessor(final BeanDescription.Supplier beanDescRef) {
         for(final var matcher: this.processorMatchers) {
-            if(matcher.isMatch(beanDesc)) {
+            if(matcher.isMatch(beanDescRef)) {
                 return Optional.of(matcher);
             }
         }
         return Optional.empty();
     }
 
-    private JsonDeserializer<?> wrapIfMatched(final JsonDeserializer<?> defaultSerializer, final BeanDescription beanDesc) {
-        final var maybePreProcessor = this.resolvePreProcessor(beanDesc);
+    private ValueDeserializer<?> wrapIfMatched(final ValueDeserializer<?> defaultDeserializer, final BeanDescription.Supplier beanDescRef) {
+        final var maybePreProcessor = this.resolvePreProcessor(beanDescRef);
         if(maybePreProcessor.isPresent()) {
             return new JsonParserPreProcessingDeserializer<>(
-                    defaultSerializer,
+                    defaultDeserializer,
                     maybePreProcessor.get()
             );
         }
-        return defaultSerializer;
+        return defaultDeserializer;
     }
 
     @Override
-    public JsonDeserializer<?> modifyDeserializer(final DeserializationConfig config,
-                                                  final BeanDescription beanDesc,
-                                                  final JsonDeserializer<?> deserializer) {
-        final var defaultSerializer = super.modifyDeserializer(config, beanDesc, deserializer);
-        return this.wrapIfMatched(defaultSerializer, beanDesc);
+    public ValueDeserializer<?> modifyDeserializer(final DeserializationConfig config,
+                                                   final BeanDescription.Supplier beanDescRef,
+                                                   final ValueDeserializer<?> deserializer) {
+        final var defaultDeserializer = super.modifyDeserializer(config, beanDescRef, deserializer);
+        return this.wrapIfMatched(defaultDeserializer, beanDescRef);
     }
 
     @Override
-    public JsonDeserializer<?> modifyEnumDeserializer(DeserializationConfig config, JavaType type, BeanDescription beanDesc, JsonDeserializer<?> deserializer) {
-        final var defaultSerializer = super.modifyEnumDeserializer(config, type, beanDesc, deserializer);
-        return this.wrapIfMatched(defaultSerializer, beanDesc);
+    public ValueDeserializer<?> modifyEnumDeserializer(DeserializationConfig config, JavaType type, BeanDescription.Supplier beanDescRef, ValueDeserializer<?> deserializer) {
+        final var defaultDeserializer = super.modifyEnumDeserializer(config, type, beanDescRef, deserializer);
+        return this.wrapIfMatched(defaultDeserializer, beanDescRef);
     }
 }

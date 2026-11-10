@@ -1,8 +1,8 @@
 package no.nav.openapi.spec.utils.openapi;
 
 import com.fasterxml.jackson.annotation.JsonView;
-import com.fasterxml.jackson.databind.introspect.AnnotatedMethod;
-import io.swagger.v3.jaxrs2.Reader;
+import tools.jackson.databind.introspect.AnnotatedMethod;
+import io.swagger.v3.rest.Reader;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.integration.api.OpenAPIConfiguration;
 import io.swagger.v3.oas.models.ExternalDocumentation;

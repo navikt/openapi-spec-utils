@@ -1,9 +1,7 @@
 package no.nav.openapi.spec.utils.jackson;
 
-import com.fasterxml.jackson.core.JsonParser;
-
-import java.io.IOException;
+import tools.jackson.core.JsonParser;
 
 public interface JsonParserPreProcessor {
-    public JsonParser preProcess(JsonParser p) throws IOException;
+    public JsonParser preProcess(JsonParser p);
 }

@@ -1,10 +1,9 @@
 package no.nav.openapi.spec.utils.golden;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.databind.module.SimpleModule;
-import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.cfg.DateTimeFeature;
+import tools.jackson.databind.json.JsonMapper;
+import tools.jackson.databind.module.SimpleModule;
 import io.swagger.v3.oas.models.info.Info;
 import io.swagger.v3.oas.models.servers.Server;
 import no.nav.openapi.spec.utils.jackson.JsonParserPreProcessingDeserializerModifier;
@@ -42,20 +41,17 @@ public class GoldenOutputTest {
     /**
      * Base mapper, configured like the base mappers in k9-sak and fptilbake.
      */
-    private static ObjectMapper baseMapper() {
-        final var om = new ObjectMapper();
-        om.registerModule(new Jdk8Module());
-        om.registerModule(new JavaTimeModule());
-        om.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
-        om.registerSubtypes(ThirdExtensionClassA.class, ThirdExtensionClassB.class, ExternalPropertyIncludeA.class);
-        return om;
+    private static JsonMapper baseMapper() {
+        return JsonMapper.builderWithJackson2Defaults()
+                .disable(DateTimeFeature.WRITE_DATES_AS_TIMESTAMPS)
+                .registerSubtypes(ThirdExtensionClassA.class, ThirdExtensionClassB.class, ExternalPropertyIncludeA.class)
+                .build();
     }
 
-    private static ObjectMapper withPreProcessing(final ObjectMapper om) {
+    private static JsonMapper withPreProcessing(final JsonMapper om) {
         final var module = new SimpleModule("preprocessing");
         module.setDeserializerModifier(new JsonParserPreProcessingDeserializerModifier(new ObjectToPropertyPreProcessor(SomeInterface.class, "codeValue")));
-        om.registerModule(module);
-        return om;
+        return om.rebuild().addModule(module).build();
     }
 
     private static ObjectMapper mapper(final String variant) {

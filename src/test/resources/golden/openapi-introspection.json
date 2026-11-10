@@ -3,10 +3,10 @@
     "schemas" : {
       "jackson.dto.IntrospectionDto" : {
         "properties" : {
-          "aarsak" : {
+          "ENavn" : {
             "type" : "string"
           },
-          "enavn" : {
+          "aarsak" : {
             "type" : "string"
           },
           "fast" : {

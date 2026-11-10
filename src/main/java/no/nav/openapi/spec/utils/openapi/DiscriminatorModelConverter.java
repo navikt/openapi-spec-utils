@@ -3,7 +3,7 @@ package no.nav.openapi.spec.utils.openapi;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.annotation.JsonTypeName;
-import com.fasterxml.jackson.databind.type.SimpleType;
+import tools.jackson.databind.type.SimpleType;
 import io.swagger.v3.core.converter.AnnotatedType;
 import io.swagger.v3.core.converter.ModelConverter;
 import io.swagger.v3.core.converter.ModelConverterContext;
@@ -179,7 +179,7 @@ public class DiscriminatorModelConverter implements ModelConverter {
 
                     // Get the actual Schema when the returned resolved is a ref to it.
                     final Schema resolvedOrReferenced = resolved.get$ref() != null ?
-                            context.getDefinedModels().get(RefUtils.extractSimpleName(resolved.get$ref()).getKey()) :
+                            context.getDefinedModels().get(RefUtils.extractSimpleName(resolved.get$ref()).getLeft()) :
                             resolved;
 
                     fixDiscriminator(type, typeRawClass, resolvedOrReferenced);
