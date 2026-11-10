@@ -44,7 +44,7 @@ public class OpenapiCompatObjectMapperModifierTest {
                         List.of(ValueAnnotatedEnum.VALUE_A, ValueAnnotatedEnum.VALUE_B),
                         new NotEnumCodeValue("txt for vvvv", "vvvv")
                 ),
-                new ContainerB(ValueAnnotatedEnum.VALUE_B, "txt")
+                new ContainerB(ValueAnnotatedEnum.VALUE_B, "txt", ValueAnnotatedEnum.VALUE_B)
         );
     }
 
