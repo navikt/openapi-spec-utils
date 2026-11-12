@@ -1,11 +1,9 @@
 package no.nav.openapi.spec.utils.jackson;
 
-import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.databind.SerializerProvider;
-import com.fasterxml.jackson.databind.ser.std.StdSerializer;
+import tools.jackson.core.JsonGenerator;
+import tools.jackson.databind.SerializationContext;
+import tools.jackson.databind.ser.std.StdSerializer;
 import no.nav.openapi.spec.utils.jackson.dto.SomeInterface;
-
-import java.io.IOException;
 
 public class SomeInterfaceSpecialSerializer extends StdSerializer<SomeInterface> {
     /**
@@ -21,10 +19,10 @@ public class SomeInterfaceSpecialSerializer extends StdSerializer<SomeInterface>
     }
 
     @Override
-    public void serialize(SomeInterface some, JsonGenerator jgen, SerializerProvider provider) throws IOException {
+    public void serialize(SomeInterface some, JsonGenerator jgen, SerializationContext ctxt) {
         if(asObject) {
             jgen.writeStartObject();
-            jgen.writeStringField("codeValue", some.codeValue());
+            jgen.writeStringProperty("codeValue", some.codeValue());
             jgen.writeEndObject();
         } else {
             jgen.writeString(some.codeValue());

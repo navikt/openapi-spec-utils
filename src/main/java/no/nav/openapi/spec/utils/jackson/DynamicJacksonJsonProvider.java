@@ -1,7 +1,7 @@
 package no.nav.openapi.spec.utils.jackson;
 
-import com.fasterxml.jackson.jakarta.rs.cfg.JakartaRSFeature;
-import com.fasterxml.jackson.jakarta.rs.json.JacksonJsonProvider;
+import tools.jackson.jakarta.rs.cfg.JakartaRSFeature;
+import tools.jackson.jakarta.rs.json.JacksonJsonProvider;
 import jakarta.enterprise.inject.Specializes;
 import jakarta.annotation.Priority;
 

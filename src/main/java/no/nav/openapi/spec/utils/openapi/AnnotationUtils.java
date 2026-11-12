@@ -1,6 +1,6 @@
 package no.nav.openapi.spec.utils.openapi;
 
-import com.fasterxml.jackson.databind.type.SimpleType;
+import tools.jackson.databind.type.SimpleType;
 import io.swagger.v3.core.util.AnnotationsUtils;
 
 import java.lang.annotation.Annotation;

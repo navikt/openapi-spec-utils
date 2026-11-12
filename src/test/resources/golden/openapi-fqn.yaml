@@ -1,0 +1,350 @@
+components:
+  schemas:
+    no.nav.openapi.spec.utils.jackson.dto.AbstractWithSchema:
+      description: this abstract class has a schema annotation
+      properties:
+        superWithSchema:
+          type: string
+      type: object
+    no.nav.openapi.spec.utils.jackson.dto.ContainerA:
+      properties:
+        listOfValueAnnotatedEnums:
+          items:
+            $ref: "#/components/schemas/no.nav.openapi.spec.utils.jackson.dto.ValueAnnotatedEnum"
+          type: array
+        notEnumCodeValue:
+          $ref: "#/components/schemas/no.nav.openapi.spec.utils.jackson.dto.NotEnumCodeValue"
+        objectAnnotatedEnum:
+          $ref: "#/components/schemas/no.nav.openapi.spec.utils.jackson.dto.ObjectAnnotatedEnum"
+        otherData:
+          $ref: "#/components/schemas/no.nav.openapi.spec.utils.jackson.dto.OtherData"
+        unAnnotatedEnum:
+          $ref: "#/components/schemas/no.nav.openapi.spec.utils.jackson.dto.UnAnnotatedEnum"
+        valueAnnotatedEnum:
+          $ref: "#/components/schemas/no.nav.openapi.spec.utils.jackson.dto.ValueAnnotatedEnum"
+      type: object
+    no.nav.openapi.spec.utils.jackson.dto.ContainerB:
+      properties:
+        enum1:
+          $ref: "#/components/schemas/no.nav.openapi.spec.utils.jackson.dto.ValueAnnotatedEnum"
+        txt1:
+          type: string
+      type: object
+    no.nav.openapi.spec.utils.jackson.dto.ContainerC:
+      properties:
+        date:
+          format: date
+          type: string
+        dateTime:
+          format: date-time
+          type: string
+        duration:
+          format: duration
+          type: string
+        enumKeyedMap:
+          additionalProperties:
+            type: string
+          type: object
+        flag:
+          type: boolean
+        nullableNumber:
+          format: int32
+          type: integer
+        optionalText:
+          type: string
+        others:
+          items:
+            $ref: "#/components/schemas/no.nav.openapi.spec.utils.jackson.dto.OtherAbstractClass"
+          type: array
+        thirdSuperClass:
+          $ref: "#/components/schemas/no.nav.openapi.spec.utils.jackson.dto.ThirdSuperClass"
+        toStringObjectEnum:
+          $ref: "#/components/schemas/no.nav.openapi.spec.utils.jackson.dto.ToStringObjectEnum"
+        toStringObjectEnums:
+          items:
+            $ref: "#/components/schemas/no.nav.openapi.spec.utils.jackson.dto.ToStringObjectEnum"
+          type: array
+        yearMonth:
+          format: year-month
+          type: string
+      type: object
+    no.nav.openapi.spec.utils.jackson.dto.DummyEnum:
+      enum:
+      - V1
+      - V2
+      type: string
+      x-enum-varnames:
+      - DUMMY_V1
+      - DUMMY_V2
+    no.nav.openapi.spec.utils.jackson.dto.ExternalPropertyIncludeA:
+      properties:
+        tst:
+          type: string
+      type: object
+    no.nav.openapi.spec.utils.jackson.dto.ExternalPropertyIncludeContainer:
+      properties:
+        included:
+          $ref: "#/components/schemas/no.nav.openapi.spec.utils.jackson.dto.ExternalPropertyIncludeInterface"
+        includedDiscriminator:
+          $ref: "#/components/schemas/no.nav.openapi.spec.utils.jackson.dto.DummyEnum"
+      type: object
+    no.nav.openapi.spec.utils.jackson.dto.ExternalPropertyIncludeInterface:
+      oneOf:
+      - $ref: "#/components/schemas/no.nav.openapi.spec.utils.jackson.dto.ExternalPropertyIncludeA"
+      type: object
+    no.nav.openapi.spec.utils.jackson.dto.NotEnumCodeValue:
+      properties:
+        codeValue:
+          type: string
+        txt:
+          type: string
+      type: object
+    no.nav.openapi.spec.utils.jackson.dto.ObjectAnnotatedEnum:
+      enum:
+      - VALUE_A
+      - VALUE_B
+      type: string
+      x-enum-varnames:
+      - VALUE_A
+      - VALUE_B
+    no.nav.openapi.spec.utils.jackson.dto.OtherAbstractClass:
+      discriminator:
+        mapping:
+          a: "#/components/schemas/no.nav.openapi.spec.utils.jackson.dto.OtherExtensionClassA"
+          a2: "#/components/schemas/no.nav.openapi.spec.utils.jackson.dto.OtherExtensionClassA"
+          b: "#/components/schemas/no.nav.openapi.spec.utils.jackson.dto.OtherExtensionClassB"
+        propertyName: typename
+      oneOf:
+      - $ref: "#/components/schemas/no.nav.openapi.spec.utils.jackson.dto.OtherExtensionClassA"
+      - $ref: "#/components/schemas/no.nav.openapi.spec.utils.jackson.dto.OtherExtensionClassB"
+      properties:
+        infoOnSuperClass:
+          type: string
+        typename:
+          type: string
+      required:
+      - typename
+      type: object
+    no.nav.openapi.spec.utils.jackson.dto.OtherData:
+      description: "description of other data, tests stackoveflow issue that was does\
+        \ not reappear"
+      properties:
+        num1:
+          format: int32
+          type: integer
+        num2:
+          format: int32
+          type: integer
+        txt1:
+          type: string
+      type: object
+    no.nav.openapi.spec.utils.jackson.dto.OtherExtensionClassA:
+      properties:
+        infoOnSuperClass:
+          type: string
+        otherExtensionA:
+          type: string
+      type: object
+    no.nav.openapi.spec.utils.jackson.dto.OtherExtensionClassB:
+      properties:
+        infoOnSuperClass:
+          type: string
+        otherExtensionB:
+          type: string
+      type: object
+    no.nav.openapi.spec.utils.jackson.dto.SomeAbstractClass:
+      discriminator:
+        mapping:
+          no.nav.openapi.spec.utils.jackson.dto.SomeExtensionClassA: "#/components/schemas/no.nav.openapi.spec.utils.jackson.dto.SomeExtensionClassA"
+          no.nav.openapi.spec.utils.jackson.dto.SomeExtensionClassB: "#/components/schemas/no.nav.openapi.spec.utils.jackson.dto.SomeExtensionClassB"
+        propertyName: cls
+      oneOf:
+      - $ref: "#/components/schemas/no.nav.openapi.spec.utils.jackson.dto.SomeExtensionClassA"
+      - $ref: "#/components/schemas/no.nav.openapi.spec.utils.jackson.dto.SomeExtensionClassB"
+      properties:
+        cls:
+          type: string
+        infoOnSuperClass:
+          type: string
+      required:
+      - cls
+      type: object
+    no.nav.openapi.spec.utils.jackson.dto.SomeExtensionClassA:
+      properties:
+        extensionA:
+          type: string
+        infoOnSuperClass:
+          type: string
+      type: object
+    no.nav.openapi.spec.utils.jackson.dto.SomeExtensionClassB:
+      properties:
+        extensionB:
+          type: string
+        infoOnSuperClass:
+          type: string
+      type: object
+    no.nav.openapi.spec.utils.jackson.dto.ThirdExtensionClassA:
+      properties:
+        propertyA:
+          type: string
+        superInfo:
+          type: string
+      type: object
+    no.nav.openapi.spec.utils.jackson.dto.ThirdExtensionClassB:
+      properties:
+        propertyB:
+          type: string
+        superInfo:
+          type: string
+      type: object
+    no.nav.openapi.spec.utils.jackson.dto.ThirdSuperClass:
+      discriminator:
+        mapping:
+          KODE_A: "#/components/schemas/no.nav.openapi.spec.utils.jackson.dto.ThirdExtensionClassA"
+          KODE_B: "#/components/schemas/no.nav.openapi.spec.utils.jackson.dto.ThirdExtensionClassB"
+        propertyName: '@type'
+      oneOf:
+      - $ref: "#/components/schemas/no.nav.openapi.spec.utils.jackson.dto.ThirdExtensionClassA"
+      - $ref: "#/components/schemas/no.nav.openapi.spec.utils.jackson.dto.ThirdExtensionClassB"
+      properties:
+        superInfo:
+          type: string
+      type: object
+    no.nav.openapi.spec.utils.jackson.dto.ToStringObjectEnum:
+      enum:
+      - KODE-A
+      - KODE-B
+      type: string
+      x-enum-varnames:
+      - VALUE_A
+      - VALUE_B
+    no.nav.openapi.spec.utils.jackson.dto.UnAnnotatedEnum:
+      enum:
+      - VALUE_A
+      - VALUE_B
+      type: string
+      x-enum-varnames:
+      - VALUE_A
+      - VALUE_B
+    no.nav.openapi.spec.utils.jackson.dto.ValueAnnotatedEnum:
+      enum:
+      - A
+      - B
+      type: string
+      x-enum-varnames:
+      - VALUE_A
+      - VALUE_B
+    no.nav.openapi.spec.utils.openapi.DummyDto:
+      properties:
+        abstractClass:
+          $ref: "#/components/schemas/no.nav.openapi.spec.utils.jackson.dto.SomeAbstractClass"
+        durationProperty:
+          format: duration
+          type: string
+        enumProperty:
+          $ref: "#/components/schemas/no.nav.openapi.spec.utils.openapi.DummyEnum"
+        includeContainer:
+          $ref: "#/components/schemas/no.nav.openapi.spec.utils.jackson.dto.ExternalPropertyIncludeContainer"
+        nummerProperty:
+          format: int32
+          type: integer
+        otherAbstractClass:
+          $ref: "#/components/schemas/no.nav.openapi.spec.utils.jackson.dto.OtherAbstractClass"
+        tekstProperty:
+          type: string
+        thirdSuperClass:
+          $ref: "#/components/schemas/no.nav.openapi.spec.utils.jackson.dto.ThirdSuperClass"
+        yearMonthProperty:
+          format: year-month
+          type: string
+      type: object
+    no.nav.openapi.spec.utils.openapi.DummyEnum:
+      enum:
+      - V1
+      - V2
+      type: string
+      x-enum-varnames:
+      - DUMMY_V1
+      - DUMMY_V2
+info:
+  title: golden
+  version: "1"
+openapi: 3.0.1
+paths:
+  /api/testing/abstract:
+    post:
+      description: reproduction of resolve loop issue
+      operationId: other
+      responses:
+        default:
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/no.nav.openapi.spec.utils.jackson.dto.AbstractWithSchema"
+          description: default response
+  /api/testing/containerA:
+    post:
+      description: "takes ContainerA, returns ContainerB"
+      operationId: containerA
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/no.nav.openapi.spec.utils.jackson.dto.ContainerA"
+      responses:
+        default:
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/no.nav.openapi.spec.utils.jackson.dto.ContainerB"
+          description: default response
+  /api/testing/containerC/{id}:
+    get:
+      description: returns ContainerC
+      operationId: containerC
+      parameters:
+      - in: path
+        name: id
+        required: true
+        schema:
+          format: int64
+          type: integer
+      - in: query
+        name: type
+        schema:
+          $ref: "#/components/schemas/no.nav.openapi.spec.utils.jackson.dto.ToStringObjectEnum"
+      responses:
+        default:
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: "#/components/schemas/no.nav.openapi.spec.utils.jackson.dto.ContainerC"
+                nullable: true
+          description: default response
+  /api/testing/dummy:
+    get:
+      description: returns dummy dto
+      operationId: dummy
+      responses:
+        default:
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/no.nav.openapi.spec.utils.openapi.DummyDto"
+          description: default response
+  /api/testing/optional:
+    get:
+      description: returns optional dummy dto
+      operationId: optionalDummy
+      responses:
+        default:
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: "#/components/schemas/no.nav.openapi.spec.utils.openapi.DummyDto"
+                nullable: true
+          description: default response
+servers:
+- url: /golden

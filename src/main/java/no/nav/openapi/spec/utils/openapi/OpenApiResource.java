@@ -1,9 +1,9 @@
 package no.nav.openapi.spec.utils.openapi;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.MapperFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.MapperFeature;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.SerializationFeature;
 import io.swagger.v3.core.util.ObjectMapperFactory;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.models.OpenAPI;
@@ -46,10 +46,11 @@ public class OpenApiResource {
      * Without this, the output would randomly change, causing unwanted git diffs in the output.
      */
     protected ObjectMapper withDeterministicOutput(final ObjectMapper om) {
-        return om.copy()
-                .configure(SerializationFeature.ORDER_MAP_ENTRIES_BY_KEYS, true)
-                .configure(MapperFeature.SORT_CREATOR_PROPERTIES_FIRST, true)
-                .configure(MapperFeature.SORT_PROPERTIES_ALPHABETICALLY, true);
+        return om.rebuild()
+                .enable(SerializationFeature.ORDER_MAP_ENTRIES_BY_KEYS)
+                .enable(MapperFeature.SORT_CREATOR_PROPERTIES_FIRST)
+                .enable(MapperFeature.SORT_PROPERTIES_ALPHABETICALLY)
+                .build();
     }
 
     public OpenApiResource(final OpenAPI resolvedOpenAPI) {
@@ -74,7 +75,7 @@ public class OpenApiResource {
      * @param wantsYaml true: Return openapi spec as yaml. false: Return as json
      * @return the contained OpenAPI object serialized as json or yaml string.
      */
-    public String openApiAsString(final boolean wantsYaml) throws JsonProcessingException {
+    public String openApiAsString(final boolean wantsYaml) throws JacksonException {
         final ObjectMapper om = wantsYaml ? this.yamlOutputMapper : this.jsonOutputMapper;
         return om.writerWithDefaultPrettyPrinter().writeValueAsString(this.resolvedOpenAPI);
     }
@@ -82,7 +83,7 @@ public class OpenApiResource {
     @GET
     @Produces({MediaType.APPLICATION_JSON, "application/yaml"})
     @Operation(hidden = true)
-    public Response getOpenApi(@PathParam("type") final String type) throws JsonProcessingException {
+    public Response getOpenApi(@PathParam("type") final String type) throws JacksonException {
         final boolean wantsYaml = type.equalsIgnoreCase("yaml");
         final String contentType = wantsYaml ? "application/yaml" : MediaType.APPLICATION_JSON;
         final String content = this.openApiAsString(wantsYaml);

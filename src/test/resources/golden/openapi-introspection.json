@@ -1,0 +1,62 @@
+{
+  "components" : {
+    "schemas" : {
+      "jackson.dto.IntrospectionDto" : {
+        "properties" : {
+          "ENavn" : {
+            "type" : "string"
+          },
+          "aarsak" : {
+            "type" : "string"
+          },
+          "fast" : {
+            "type" : "string"
+          },
+          "liste" : {
+            "items" : {
+              "type" : "string"
+            },
+            "type" : "array"
+          }
+        },
+        "type" : "object"
+      }
+    }
+  },
+  "info" : {
+    "title" : "golden",
+    "version" : "1"
+  },
+  "openapi" : "3.0.1",
+  "paths" : {
+    "/api/introspection" : {
+      "post" : {
+        "operationId" : "introspection",
+        "requestBody" : {
+          "content" : {
+            "*/*" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/jackson.dto.IntrospectionDto"
+              }
+            }
+          }
+        },
+        "responses" : {
+          "default" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/jackson.dto.IntrospectionDto"
+                }
+              }
+            },
+            "description" : "default response"
+          }
+        }
+      }
+    }
+  },
+  "servers" : [ {
+    "url" : "/golden"
+  } ]
+}

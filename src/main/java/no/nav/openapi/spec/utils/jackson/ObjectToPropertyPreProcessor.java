@@ -1,10 +1,10 @@
 package no.nav.openapi.spec.utils.jackson;
 
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.JsonToken;
-import com.fasterxml.jackson.databind.BeanDescription;
+import tools.jackson.core.JsonParser;
+import tools.jackson.core.JsonToken;
+import tools.jackson.core.TreeNode;
+import tools.jackson.databind.BeanDescription;
 
-import java.io.IOException;
 import java.util.Objects;
 
 /**
@@ -43,19 +43,19 @@ public class ObjectToPropertyPreProcessor implements PreProcessorMatcher {
     }
 
     @Override
-    public boolean isMatch(BeanDescription beanDesc) {
-        return beanDesc.getType().isTypeOrSubTypeOf(this.matchClass);
+    public boolean isMatch(BeanDescription.Supplier beanDescRef) {
+        return beanDescRef.getType().isTypeOrSubTypeOf(this.matchClass);
     }
 
     @Override
-    public JsonParser preProcess(JsonParser p) throws IOException {
+    public JsonParser preProcess(JsonParser p) {
         // If parser is at start of an object.
         if(p.currentToken() == JsonToken.START_OBJECT) {
-            final var obj = p.readValueAsTree();
+            final TreeNode obj = p.readValueAsTree();
             if(obj.isObject()) {
                 final var kode = obj.get(this.propertyName);
                 if(kode != null) {
-                    final JsonParser subParser = kode.traverse(p.getCodec());
+                    final JsonParser subParser = kode.traverse(p.objectReadContext());
                     subParser.nextToken(); // Bring the new parser forward to start of kode value
                     return subParser;
                 }
@@ -63,7 +63,7 @@ public class ObjectToPropertyPreProcessor implements PreProcessorMatcher {
             // Not an object, or property not found. Continue as if no pre-processing has happened.
             // Don't think this will ever occur unless some implementation mistake has been done.
             // If this happens, later deserialization will probably fail.
-            final var passthroughSubParser = obj.traverse(p.getCodec());
+            final var passthroughSubParser = obj.traverse(p.objectReadContext());
             passthroughSubParser.nextToken(); // Bring the new parser forward to start of kode value
             return passthroughSubParser;
         }
