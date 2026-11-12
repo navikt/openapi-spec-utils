@@ -20,6 +20,21 @@
           }
         },
         "type" : "object"
+      },
+      "jackson.dto.IntrospectionRecord" : {
+        "properties" : {
+          "annen" : {
+            "type" : "string"
+          },
+          "nummer" : {
+            "format" : "int32",
+            "type" : "integer"
+          },
+          "tekst" : {
+            "type" : "string"
+          }
+        },
+        "type" : "object"
       }
     }
   },
@@ -47,6 +62,32 @@
               "*/*" : {
                 "schema" : {
                   "$ref" : "#/components/schemas/jackson.dto.IntrospectionDto"
+                }
+              }
+            },
+            "description" : "default response"
+          }
+        }
+      }
+    },
+    "/api/introspection/record" : {
+      "post" : {
+        "operationId" : "record",
+        "requestBody" : {
+          "content" : {
+            "*/*" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/jackson.dto.IntrospectionRecord"
+              }
+            }
+          }
+        },
+        "responses" : {
+          "default" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/jackson.dto.IntrospectionRecord"
                 }
               }
             },
