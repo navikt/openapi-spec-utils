@@ -19,6 +19,9 @@ public class ContainerB {
     @JsonProperty(value = "txt1")
     private String txt1;
 
+    @JsonProperty(value = "renamedByAnnotation")
+    private ValueAnnotatedEnum newName;
+
     public ValueAnnotatedEnum getEnum1() {
         return enum1;
     }
@@ -26,9 +29,10 @@ public class ContainerB {
     public ContainerB() {
     }
 
-    public ContainerB(ValueAnnotatedEnum enum1, String txt1) {
+    public ContainerB(ValueAnnotatedEnum enum1, String txt1, ValueAnnotatedEnum newName) {
         this.enum1 = enum1;
         this.txt1 = txt1;
+        this.newName = newName;
     }
 
     public void setEnum1(ValueAnnotatedEnum enum1) {
@@ -43,15 +47,23 @@ public class ContainerB {
         this.txt1 = txt1;
     }
 
+    public ValueAnnotatedEnum getNewName() {
+        return newName;
+    }
+
+    public void setNewName(ValueAnnotatedEnum newName) {
+        this.newName = newName;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (!(o instanceof ContainerB that)) return false;
-        return enum1 == that.enum1 && Objects.equals(txt1, that.txt1);
+        return enum1 == that.enum1 && Objects.equals(txt1, that.txt1) && Objects.equals(newName, that.newName);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(enum1, txt1);
+        return Objects.hash(enum1, txt1, newName);
     }
 
     @Override
@@ -59,6 +71,7 @@ public class ContainerB {
         return "ContainerB{" +
                 "enum1=" + enum1 +
                 ", txt1='" + txt1 + '\'' +
+                ", newName='" + newName + '\'' +
                 '}';
     }
 }
